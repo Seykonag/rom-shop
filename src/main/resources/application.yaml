@@ -1,0 +1,19 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+  datasource:
+    url: jdbc:postgresql://localhost:5432/shop
+    username: postgres
+    password: komka123
+  flyway:
+    baseline-on-migrate: true
+  main:
+    allow-circular-references: false
+
+token:
+  signIn:
+    key: 9a4f2c8d1b3a1e6f46a8a0b3f267d8b1d5e6f3c8a9a2b5f8e3a9c8b5f6v8a3d9
+
+

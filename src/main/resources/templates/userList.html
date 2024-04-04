@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head xmlns:th="http://www.w3.org/1999/xhtml">
+    <meta charset="UTF-8">
+    <title>User List</title>
+</head>
+<body>
+    <table>
+        <tr>
+            <td>
+                Name
+            </td>
+            <td>
+                Email
+            </td>
+        </tr>
+        <tr th:each="user: ${users}">
+            <td th:text="${user.username}">
+                Testname
+            </td>
+            <td th:text="${user.email}">
+                Testemail
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

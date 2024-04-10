@@ -32,15 +32,10 @@ public class ProductService {
             throw new RuntimeException("Пользователь не найден");
         }
 
-        Bucket bucket = user.getBucket();
+        Bucket bucket =user.getBucket();
 
-        if (bucket == null) {
-            Bucket newBucket = bucketService.createBucket(user, Collections.singletonList(productId));
-            user.setBucket(newBucket);
-            userRepository.save(user);
-        } else {
-            bucketService.addProducts(bucket, Collections.singletonList(productId));
-        }
+        if (bucket == null) throw new RuntimeException("Not bucket");
+        bucketService.addProducts(bucket, Collections.singletonList(productId));
     }
 
     public void createProduct (ProductDTO productDTO) {

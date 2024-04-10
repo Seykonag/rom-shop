@@ -1,5 +1,6 @@
 package kz.services.romshop.services;
 
+import jakarta.transaction.Transactional;
 import kz.services.romshop.dto.JwtAuthDTO;
 import kz.services.romshop.dto.LoginDTO;
 import kz.services.romshop.dto.RegistrationDTO;
@@ -15,17 +16,21 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+
 @Service
 @Component
 @RequiredArgsConstructor
 public class AuthService {
     private final UserService userService;
     private final UserRepository repository;
+    private final BucketService bucketService;
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
 
 
+    @Transactional
     public JwtAuthDTO signUp(RegistrationDTO registrationDTO, boolean admin) {
         var user = User.builder()
                 .username(registrationDTO.getUsername())
@@ -46,6 +51,7 @@ public class AuthService {
                 .build();
 
         userService.create(user);
+        bucketService.createBucket(user, new ArrayList<>());
 
         var jwt = jwtService.generateToken(user);
         return new JwtAuthDTO(jwt);
@@ -65,6 +71,7 @@ public class AuthService {
         return new JwtAuthDTO(jwt);
     }
 
+    @Transactional
     public void firstAdmin() {
         if (repository.findByUsername("admin").isEmpty()) {
             User user = User.builder()
@@ -83,6 +90,7 @@ public class AuthService {
                     .build();
 
             userService.create(user);
+            bucketService.createBucket(user, new ArrayList<>());
         }
     }
 }

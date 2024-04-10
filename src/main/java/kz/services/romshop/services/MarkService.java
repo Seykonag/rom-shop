@@ -1,12 +1,12 @@
 package kz.services.romshop.services;
 
 import jakarta.transaction.Transactional;
-import kz.services.romshop.dto.BucketDTO;
 import kz.services.romshop.dto.BucketDetailsDTO;
-import kz.services.romshop.models.Bucket;
+import kz.services.romshop.dto.MarkDTO;
+import kz.services.romshop.models.Mark;
 import kz.services.romshop.models.Product;
 import kz.services.romshop.models.User;
-import kz.services.romshop.repositories.BucketRepository;
+import kz.services.romshop.repositories.MarkRepository;
 import kz.services.romshop.repositories.ProductRepository;
 import kz.services.romshop.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,37 +21,38 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class BucketService {
-    private final BucketRepository bucketRepository;
-    private final ProductRepository productRepository;
-    private final UserRepository userRepository;
+public class MarkService {
     private final UserService userService;
+    private final MarkRepository markRepository;
+    private final UserRepository userRepository;
+    private final ProductRepository productRepository;
 
     @Transactional
-    public Bucket createBucket(User user) {
-        Bucket bucket = new Bucket();
-        bucket.setId(user.getId());
-        bucket.setUser(user);
-        user.setBucket(bucket);
+    public Mark createMark(User user) {
+        Mark mark = new Mark();
+        mark.setId(user.getId());
+        mark.setUser(user);
+        user.setMark(mark);
         userRepository.save(user);
-        return bucketRepository.save(bucket);
+        return markRepository.save(mark);
     }
 
-    public void addProducts(Bucket bucket, List<Long> productId) {
-        List<Product> products = bucket.getProducts();
+    public void addProducts(Mark mark, List<Long> productId) {
+        List<Product> products = mark.getProducts();
         List<Product> newProducts = products == null ? new ArrayList<>() : new ArrayList<>(products);
         newProducts.addAll(getCollectRefProductsById(productId));
-        bucket.setProducts(newProducts);
-        bucketRepository.save(bucket);
+        mark.setProducts(newProducts);
+        markRepository.save(mark);
     }
 
-    public BucketDTO getBucketByUsername(String name) {
-        User user = userService.getByUsername(name);
+    public MarkDTO getMarkByUsername(String username) {
+        User user = userService.getByUsername(username);
 
-        BucketDTO bucketDTO = new BucketDTO();
+        MarkDTO markDTO = new MarkDTO();
+
         Map<Long, BucketDetailsDTO> mapByProductId = new HashMap<>();
+        List<Product> products = user.getMark().getProducts();
 
-        List<Product> products = user.getBucket().getProducts();
         for (Product product: products) {
             BucketDetailsDTO detail = mapByProductId.get(product.getId());
 
@@ -62,11 +63,9 @@ public class BucketService {
             }
         }
 
-
-        bucketDTO.setBucketDetails(new ArrayList<>(mapByProductId.values()));
-        bucketDTO.aggregate();
-
-        return bucketDTO;
+        markDTO.setBucketDetails(new ArrayList<>(mapByProductId.values()));
+        markDTO.formation();
+        return markDTO;
     }
 
     private List<Product> getCollectRefProductsById(List<Long> productId) {

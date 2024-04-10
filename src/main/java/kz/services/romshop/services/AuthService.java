@@ -23,16 +23,17 @@ import java.util.ArrayList;
 @RequiredArgsConstructor
 public class AuthService {
     private final UserService userService;
-    private final UserRepository repository;
     private final BucketService bucketService;
     private final JwtService jwtService;
+    private final MarkService markService;
+    private final UserRepository repository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
 
 
     @Transactional
     public JwtAuthDTO signUp(RegistrationDTO registrationDTO, boolean admin) {
-        var user = User.builder()
+        User user = User.builder()
                 .username(registrationDTO.getUsername())
                 .email(registrationDTO.getEmail())
                 .password(passwordEncoder.encode(registrationDTO.getPassword()))
@@ -51,7 +52,8 @@ public class AuthService {
                 .build();
 
         userService.create(user);
-        bucketService.createBucket(user, new ArrayList<>());
+        bucketService.createBucket(user);
+        markService.createMark(user);
 
         var jwt = jwtService.generateToken(user);
         return new JwtAuthDTO(jwt);
@@ -90,7 +92,8 @@ public class AuthService {
                     .build();
 
             userService.create(user);
-            bucketService.createBucket(user, new ArrayList<>());
+            bucketService.createBucket(user);
+            markService.createMark(user);
         }
     }
 }

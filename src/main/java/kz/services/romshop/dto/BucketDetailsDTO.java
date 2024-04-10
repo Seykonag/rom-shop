@@ -18,6 +18,7 @@ public class BucketDetailsDTO {
     private BigDecimal price;
     private BigDecimal amount;
     private Double sum;
+    private byte[] photo;
 
     public BucketDetailsDTO(Product product) {
         this.title = product.getTitle();
@@ -25,5 +26,6 @@ public class BucketDetailsDTO {
         this.price = product.getPrice();
         this.amount = new BigDecimal(1.0);
         this.sum = Double.valueOf(product.getPrice().toString());
+        this.photo = product.getPhoto();
     }
 }

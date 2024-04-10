@@ -11,14 +11,14 @@ import java.security.Principal;
 import java.util.List;
 
 @RestController
-@RequestMapping("/products")
 @RequiredArgsConstructor
+@RequestMapping("/products")
 public class ProductController {
     private final ProductService service;
     private final ProductRepository repository;
 
     @GetMapping
-    public List<ProductDTO> list() { return service.getAll(); }
+    public List<ProductDTO> products() { return service.getAll(); }
 
     @GetMapping("/{id}")
     public Product productInfo(@PathVariable Long id, Principal principal) {
@@ -43,5 +43,13 @@ public class ProductController {
 
         service.addToUserBucket(id, principal.getName());
         System.out.println("Success");
+    }
+
+    @GetMapping("/{id}/mark")
+    public void addMark(@PathVariable Long id, Principal principal) {
+        if (principal == null) throw new RuntimeException("Не авторизованы");
+
+        service.addToUserMark(id, principal.getName());
+        System.out.println("Success mark");
     }
 }

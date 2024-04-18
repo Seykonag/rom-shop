@@ -24,14 +24,20 @@ public class Product {
     private Long id;
     private String title;
     private BigDecimal price;
-    @ManyToMany(cascade = CascadeType.ALL)
+    private BigDecimal salePrice;
+    @ManyToOne
     @JoinTable(name = "products_categories",
             joinColumns = @JoinColumn(name = "product_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id"))
-    private List<Category> categories;
+    private Category categories;
     private String model;
     private String developer;
     @Lob
     private byte[] photo;
+    @OneToMany(cascade = CascadeType.REMOVE)
+    @JoinTable(name = "products_commentaries",
+            joinColumns = @JoinColumn(name = "product_id"),
+            inverseJoinColumns = @JoinColumn(name = "comment_id"))
+    private List<Comment> comment;
     private boolean stock;
 }

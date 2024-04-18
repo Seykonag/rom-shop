@@ -28,14 +28,7 @@ public class ProductController {
         else throw new RuntimeException("Такого продукта не существует");
     }
 
-    @PostMapping("/{id}/edit")
-    public void productEdit(@PathVariable Long id, @RequestBody ProductDTO productDTO, Principal principal) {
-        if (principal == null) throw new RuntimeException("Не авторизованы");
 
-        if (repository.findById(id).isPresent()) {
-            repository.updateProduct(productDTO, repository.findById(id).get());
-        } else throw new RuntimeException("Такого продукта не существует");
-    }
 
     @GetMapping("/{id}/bucket")
     public void addBucket(@PathVariable Long id, Principal principal) {

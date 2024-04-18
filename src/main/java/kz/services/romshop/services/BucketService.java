@@ -55,10 +55,18 @@ public class BucketService {
         for (Product product: products) {
             BucketDetailsDTO detail = mapByProductId.get(product.getId());
 
-            if (detail == null) mapByProductId.put(product.getId(), new BucketDetailsDTO(product));
-            else {
-                detail.setAmount(detail.getAmount().add(new BigDecimal(1.0)));
-                detail.setSum(detail.getSum() + Double.valueOf(product.getPrice().toString()));
+            if (product.getSalePrice() == null) {
+                if (detail == null) mapByProductId.put(product.getId(), new BucketDetailsDTO(product));
+                else {
+                    detail.setAmount(detail.getAmount().add(new BigDecimal(1.0)));
+                    detail.setSum(detail.getSum() + Double.valueOf(product.getPrice().toString()));
+                }
+            } else {
+                if (detail == null) mapByProductId.put(product.getId(), new BucketDetailsDTO(product));
+                else {
+                    detail.setAmount(detail.getAmount().add(new BigDecimal(1.0)));
+                    detail.setSum(detail.getSum() + Double.valueOf(product.getSalePrice().toString()));
+                }
             }
         }
 

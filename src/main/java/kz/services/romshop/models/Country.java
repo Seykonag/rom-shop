@@ -1,5 +1,7 @@
 package kz.services.romshop.models;
 
+import kz.services.romshop.models.Region;
+
 import java.util.Arrays;
 import java.util.List;
 

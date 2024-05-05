@@ -107,5 +107,17 @@ public class ProductService {
         repository.delete(repository.getReferenceById(id));
     }
 
-    public List<ProductDTO> getAll() { return mapper.fromProductList(repository.findAll()); }
+    public List<ProductDTO> getAll() {
+        List<ProductDTO> products = mapper.fromProductList(repository.findAll());
+
+        for (ProductDTO dto: products) {
+            Product product = repository.getReferenceById(dto.getId());
+
+            if (product.getCategories().getSale() != null) {
+                dto.setPercentageSale(product.getCategories().getSale().getSale());
+            }
+        }
+
+        return products;
+    }
 }

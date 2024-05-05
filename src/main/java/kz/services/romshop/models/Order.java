@@ -37,5 +37,8 @@ public class Order {
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
     @OneToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "orders_details_test",
+            joinColumns = @JoinColumn(name = "order_id"),
+            inverseJoinColumns = @JoinColumn(name = "details_id"))
     private List<OrderDetails> details;
 }

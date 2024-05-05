@@ -1,5 +1,8 @@
 package kz.services.romshop.models;
 
+import kz.services.romshop.models.Category;
+import kz.services.romshop.models.Comment;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

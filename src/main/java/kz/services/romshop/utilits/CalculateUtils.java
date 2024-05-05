@@ -19,4 +19,9 @@ public class CalculateUtils {
                 )
         );
     }
+
+
+    public Double multiplyProduct(BigDecimal price, BigDecimal amount) {
+        return price.multiply(amount).doubleValue();
+    }
 }

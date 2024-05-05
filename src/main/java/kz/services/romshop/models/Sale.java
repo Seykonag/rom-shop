@@ -1,5 +1,6 @@
 package kz.services.romshop.models;
 
+import kz.services.romshop.models.Category;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -24,8 +25,9 @@ public class Sale {
     @SequenceGenerator(name = SEQ_NAME, sequenceName = SEQ_NAME, allocationSize = 1)
     private Long id;
     private int sale; //percentage
-    private int percentage;
     @CreationTimestamp
     private LocalDateTime created;
     private LocalDateTime ended;
+    @OneToOne
+    private Category category;
 }

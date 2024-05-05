@@ -23,10 +23,11 @@ public class AdminNewController {
     private final CategoryService categoryService;
     private final SaleService saleService;
 
+    @PostMapping("user-client")
+    public void createClient(@RequestBody RegistrationDTO request) { authenticationService.signUp(request, false); }
+
     @PostMapping("/user-admin")
-    public void createAdmin(@RequestBody RegistrationDTO request) {
-        authenticationService.signUp(request, true);
-    }
+    public void createAdmin(@RequestBody RegistrationDTO request) { authenticationService.signUp(request, true); }
 
     @PostMapping("/category")
     public void createCategory(@RequestBody CategoryDTO request) { categoryService.createCategory(request); }

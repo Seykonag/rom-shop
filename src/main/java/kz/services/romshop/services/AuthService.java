@@ -16,8 +16,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-
 @Service
 @Component
 @RequiredArgsConstructor
@@ -26,6 +24,7 @@ public class AuthService {
     private final BucketService bucketService;
     private final JwtService jwtService;
     private final MarkService markService;
+    private final BonusService bonusService;
     private final UserRepository repository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
@@ -54,6 +53,7 @@ public class AuthService {
         userService.create(user);
         bucketService.createBucket(user);
         markService.createMark(user);
+        bonusService.createBonusScore(user);
 
         var jwt = jwtService.generateToken(user);
         return new JwtAuthDTO(jwt);
@@ -94,6 +94,7 @@ public class AuthService {
             userService.create(user);
             bucketService.createBucket(user);
             markService.createMark(user);
+            bonusService.createBonusScore(user);
         }
     }
 }

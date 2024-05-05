@@ -1,5 +1,8 @@
 package kz.services.romshop.models;
 
+import kz.services.romshop.models.User;
+import kz.services.romshop.models.Product;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

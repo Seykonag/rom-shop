@@ -1,5 +1,12 @@
 package kz.services.romshop.models;
 
+import kz.services.romshop.models.Role;
+import kz.services.romshop.models.Country;
+import kz.services.romshop.models.Region;
+import kz.services.romshop.models.Bucket;
+import kz.services.romshop.models.Mark;
+import kz.services.romshop.models.BonusScore;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -2,7 +2,6 @@ package kz.services.romshop.configurate;
 
 import kz.services.romshop.filters.JwtAuthFilter;
 import kz.services.romshop.services.UserService;
-import kz.services.romshop.configurate.PasswordEncoderConfig;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,7 +29,7 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 public class SecurityConfiguration {
     private final JwtAuthFilter jwtAuthFilter;
     private final UserService userService;
-    private final PasswordEncoderConfig passwordEncoder;
+    private final PasswordEncoderConfiguration passwordEncoder;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {

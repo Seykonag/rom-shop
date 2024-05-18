@@ -22,6 +22,11 @@ public class OrderController {
         orderService.createOrder(principal.getName(), orderDTO.getIdProducts());
     }
 
+    @GetMapping("/closed/{id}")
+    public void closedOrder(@PathVariable Long id) {
+        orderService.closedOrder(id);
+    }
+
     @GetMapping("/myOrders")
     public List<OrderDTO> myOrders(Principal principal) { return orderService.myOrders(principal.getName()); }
 }

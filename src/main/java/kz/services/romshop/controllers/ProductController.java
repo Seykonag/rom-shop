@@ -15,17 +15,13 @@ import java.util.List;
 @RequestMapping("/products")
 public class ProductController {
     private final ProductService service;
-    private final ProductRepository repository;
 
     @GetMapping
     public List<ProductDTO> products() { return service.getAll(); }
 
     @GetMapping("/{id}")
-    public Product productInfo(@PathVariable Long id, Principal principal) {
-        if (principal == null) throw new RuntimeException("Не авторизованы");
-
-        if (repository.findById(id).isPresent()) return repository.findById(id).get();
-        else throw new RuntimeException("Такого продукта не существует");
+    public ProductDTO productInfo(@PathVariable Long id) {
+        return service.getProduct(id);
     }
 
 

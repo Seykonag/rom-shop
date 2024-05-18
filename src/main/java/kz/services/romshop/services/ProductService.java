@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -103,8 +104,25 @@ public class ProductService {
     }
 
     @Transactional
-    public void deleteProduct(Long id) {
-        repository.delete(repository.getReferenceById(id));
+    public void deleteProduct(Long id) { repository.delete(repository.getReferenceById(id)); }
+
+    public ProductDTO getProduct(Long id) {
+        Product product = repository.getReferenceById(id);
+
+        return ProductDTO.builder()
+                .id(product.getId())
+                .categoryId(product.getCategories().getId())
+                .percentageSale(Optional.ofNullable(product.getCategories().getSale())
+                        .map(Sale::getSale)
+                        .orElse(0))
+                .title(product.getTitle())
+                .model(product.getModel())
+                .developer(product.getDeveloper())
+                .stock(product.isStock())
+                .photo(product.getPhoto())
+                .price(product.getPrice())
+                .salePrice(product.getSalePrice())
+                .build();
     }
 
     public List<ProductDTO> getAll() {
@@ -112,6 +130,7 @@ public class ProductService {
 
         for (ProductDTO dto: products) {
             Product product = repository.getReferenceById(dto.getId());
+            dto.setCategoryId(product.getCategories().getId());
 
             if (product.getCategories().getSale() != null) {
                 dto.setPercentageSale(product.getCategories().getSale().getSale());

@@ -1,6 +1,7 @@
 package kz.services.romshop.repositories;
 
 import kz.services.romshop.models.Order;
+import kz.services.romshop.models.OrderStatus;
 import kz.services.romshop.models.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -19,6 +20,17 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             if (order.getUser().getUsername().equals(user.getUsername())) {
                 list.add(order);
             }
+        }
+
+        return list;
+    }
+
+    default List<Order> findByStatus(OrderStatus status) {
+        List<Order> allOrders = findAll();
+        List<Order> list = new ArrayList<>();
+
+        for (Order order: allOrders) {
+            if (order.getStatus() == status) list.add(order);
         }
 
         return list;

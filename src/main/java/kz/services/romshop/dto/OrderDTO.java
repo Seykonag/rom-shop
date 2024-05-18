@@ -17,6 +17,8 @@ import java.util.Map;
 @AllArgsConstructor
 @Builder
 public class OrderDTO {
+    private Long id;
+    private String username;
     private LocalDateTime created;
     private LocalDateTime updated;
     private BigDecimal sum;

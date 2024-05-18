@@ -1,8 +1,11 @@
 package kz.services.romshop.services;
 
+import com.paypal.api.payments.Payment;
+import com.paypal.base.rest.PayPalRESTException;
 import jakarta.transaction.Transactional;
 import kz.services.romshop.dto.OrderDTO;
 import kz.services.romshop.dto.OrderDetailsDTO;
+import kz.services.romshop.dto.PaypalPayDTO;
 import kz.services.romshop.models.*;
 import kz.services.romshop.repositories.OrderDetailsRepository;
 import kz.services.romshop.repositories.OrderRepository;
@@ -13,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -20,7 +24,9 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class OrderService {
+    private final PaypalService paypalService;
     private final CalculateUtils calculateUtils;
+    private final BonusService bonusService;
     private final OrderRepository repository;
     private final UserRepository userRepository;
     private final OrderDetailsRepository orderDetailsRepository;
@@ -48,15 +54,86 @@ public class OrderService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Not user"));
 
-        List<OrderDTO> list = repository.findByUser(user).stream()
+        return repository.findByUser(user).stream()
                 .map(this::mapToOrderDTO)
                 .collect(Collectors.toList());
+    }
+
+    public List<OrderDTO> getOrderStatus(OrderStatus status) {
+        List<OrderDTO> list = new ArrayList<>();
+        List<Order> orders = repository.findByStatus(status);
+
+        for (Order order: orders) {
+            OrderDTO dto = mapToOrderDTO(order);
+            dto.setUsername(order.getUser().getUsername());
+            list.add(dto);
+        }
 
         return list;
     }
 
-    private OrderDTO mapToOrderDTO(Order order) {
+    public void confirmOrder(Map<Long, Boolean> confirms) {
+        Set<Long> keys = confirms.keySet();
+
+        for (Long key: keys) {
+            Order order = repository.getReferenceById(key);
+
+            if (order.getStatus() != OrderStatus.NEW) throw new RuntimeException("Заказ не правильно обработан");
+            if (confirms.get(key)) order.setStatus(OrderStatus.APPROVED);
+            else order.setStatus(OrderStatus.CANCELED);
+            repository.save(order);
+        }
+    }
+
+    //test variation
+    @Transactional
+    public Payment paidOrder(PaypalPayDTO dto) throws PayPalRESTException {
+        Order order = repository.getReferenceById(dto.getIdOrder());
+
+        if (order.getStatus() != OrderStatus.APPROVED) throw new RuntimeException("Заказ не одобрен");
+
+        BigDecimal paidSum = bonusService.expendBonus(order);
+
+        if (paidSum.compareTo(new BigDecimal(0)) > 0) {
+
+            return paypalService.createPayment(
+                    paidSum.doubleValue(),
+                    dto.getCurrency(),
+                    "paypal",
+                    "sale",
+                    order.getId().toString(),
+                    "http://localhost:8080/pay/cancel",
+                    "http://localhost:8080/pay/success"
+                    );
+        }
+
+        return null;
+    }
+
+    public void setOrderStatusPaid(Long id) {
+        Order order = repository.getReferenceById(id);
+        order.setStatus(OrderStatus.PAID);
+        repository.save(order);
+    }
+
+    public void closedOrder(Long id) {
+        Order order = repository.getReferenceById(id);
+
+        if (order.getStatus() != OrderStatus.PAID) {
+            throw new RuntimeException("Заказ не оплачен");
+        }
+
+        order.setStatus(OrderStatus.CLOSED);
+
+        bonusService.additionBonus(order.getUser(), order.getSum()
+                .divide(new BigDecimal(10), RoundingMode.HALF_UP));
+
+        repository.save(order);
+    }
+
+    public OrderDTO mapToOrderDTO(Order order) {
         return OrderDTO.builder()
+                .id(order.getId())
                 .sum(order.getSum())
                 .details(buildDetailsDTO(order.getDetails()))
                 .created(order.getCreated())
@@ -68,7 +145,9 @@ public class OrderService {
     private List<OrderDetailsDTO> buildDetailsDTO(List<OrderDetails> orders) {
         return orders.stream()
                 .map(order -> OrderDetailsDTO.builder()
-                        .percentageSale(order.getProduct().getCategories().getSale().getSale())
+                        .percentageSale(Optional.ofNullable(order.getProduct().getCategories().getSale())
+                                .map(Sale::getSale)
+                                .orElse(0))
                         .title(order.getProduct().getTitle())
                         .photo(order.getProduct().getPhoto())
                         .productId(order.getProduct().getId())

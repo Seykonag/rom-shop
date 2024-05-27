@@ -21,6 +21,7 @@ public class ProductDTO {
     private int percentageSale;
     private String model;
     private String developer;
+    private String realPhoto;
     private byte[] photo;
     private boolean stock;
     private Long categoryId;

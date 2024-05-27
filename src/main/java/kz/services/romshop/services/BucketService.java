@@ -45,6 +45,7 @@ public class BucketService {
         bucketRepository.save(bucket);
     }
 
+    @Transactional
     public BucketDTO getBucketByUsername(String name) {
         User user = userService.getByUsername(name);
 

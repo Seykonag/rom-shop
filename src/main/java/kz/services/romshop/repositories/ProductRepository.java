@@ -63,4 +63,17 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
         return  categoryProducts;
     }
+
+    default List<Product> findProductsByCategory(String categoryName) {
+        List<Product> allProducts = findAll();
+        List<Product> categoryProducts = new ArrayList<>();
+
+        for (Product product: allProducts) {
+            if (Objects.equals(product.getCategories().getTitle(), categoryName)) {
+                categoryProducts.add(product);
+            }
+        }
+
+        return  categoryProducts;
+    }
 }

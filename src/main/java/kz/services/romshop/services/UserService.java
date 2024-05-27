@@ -70,9 +70,6 @@ public class UserService {
     }
 
     public void upgrade (RegistrationDTO dto, String username) {
-        if (dto.getPassword() != null && !dto.getPassword().isEmpty()
-                && !dto.getPassword().equals(dto.getMatchingPassword())) throw new RuntimeException("Error password");
-
         if (repository.findByUsername(username).isPresent()) {
             updateProfile(dto, repository.findByUsername(username).get());
         } else throw new RuntimeException("Not found user");
@@ -139,6 +136,7 @@ public class UserService {
                 .fax(user.getFax())
                 .company(user.getCompany())
                 .address(user.getAddress())
+                .city(user.getCity())
                 .country(user.getCountry())
                 .region(user.getRegion())
                 .index(user.getIndex())

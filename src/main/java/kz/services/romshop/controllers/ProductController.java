@@ -41,4 +41,9 @@ public class ProductController {
         service.addToUserMark(id, principal.getName());
         System.out.println("Success mark");
     }
+
+    @PostMapping("/getCategory")
+    public List<ProductDTO> getCategory(@RequestParam String categoryName) {
+        return service.findByCategory(categoryName);
+    }
 }

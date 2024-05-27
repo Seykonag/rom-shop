@@ -1,13 +1,7 @@
 package kz.services.romshop.models;
 
-import kz.services.romshop.models.Category;
-import kz.services.romshop.models.Comment;
-
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -25,7 +19,9 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQ_NAME)
     @SequenceGenerator(name = SEQ_NAME, sequenceName = SEQ_NAME, allocationSize = 1)
     private Long id;
+    @Column(nullable = false)
     private String title;
+    @Column(nullable = false)
     private BigDecimal price;
     private BigDecimal salePrice;
     @ManyToOne
@@ -33,7 +29,9 @@ public class Product {
             joinColumns = @JoinColumn(name = "product_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id"))
     private Category categories;
+    @Column(nullable = false)
     private String model;
+    @Column(nullable = false)
     private String developer;
     @Lob
     private byte[] photo;

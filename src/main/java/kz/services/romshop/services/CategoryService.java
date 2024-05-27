@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -59,5 +60,16 @@ public class CategoryService {
 
         category.setSale(sale);
         repository.save(category);
+    }
+
+    public List<CategoryDTO> getAll() {
+        List<Category> categories = repository.findAll();
+        List<CategoryDTO> answer = new ArrayList<>();
+
+        for (Category category: categories) {
+            answer.add(new CategoryDTO(category.getTitle()));
+        }
+
+        return answer;
     }
 }

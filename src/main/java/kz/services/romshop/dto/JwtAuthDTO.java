@@ -11,4 +11,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class JwtAuthDTO {
     private String token;
+    private String username;
 }

@@ -5,7 +5,6 @@ import kz.services.romshop.models.BonusScore;
 import kz.services.romshop.models.Order;
 import kz.services.romshop.models.User;
 import kz.services.romshop.repositories.BonusRepository;
-import kz.services.romshop.repositories.OrderRepository;
 import kz.services.romshop.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,7 +14,6 @@ import java.math.BigDecimal;
 @Service
 @RequiredArgsConstructor
 public class BonusService {
-    private final OrderRepository orderRepository;
     private final UserRepository userRepository;
     private final BonusRepository repository;
 

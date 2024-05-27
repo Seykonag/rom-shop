@@ -180,5 +180,7 @@ public class OrderService {
         orderDetailsRepository.saveAll(list);
         return list;
     }
+
+    public Order getOrderById(Long id) { return repository.getReferenceById(id); }
 }
 

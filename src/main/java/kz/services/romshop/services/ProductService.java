@@ -11,9 +11,7 @@ import kz.services.romshop.utilits.CalculateUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -60,6 +58,7 @@ public class ProductService {
         if (productDTO.getCategoryId() == null) throw new RuntimeException("У продукта нет категории");
         Category category = categoryRepository.getReferenceById(productDTO.getCategoryId());
 
+        System.out.println(productDTO.getRealPhoto());
         Product product = Product.builder()
                 .title(productDTO.getTitle())
                 .price(productDTO.getPrice())
@@ -71,11 +70,9 @@ public class ProductService {
                 )
                 .model(productDTO.getModel())
                 .developer(productDTO.getDeveloper())
-                .photo(productDTO.getPhoto())
+                .photo(Base64.getDecoder().decode(productDTO.getRealPhoto()))
                 .stock(true)
-                .categories(
-                        category
-                )
+                .categories(category)
                 .build();
 
         repository.save(product);
@@ -138,5 +135,28 @@ public class ProductService {
         }
 
         return products;
+    }
+
+    public List<ProductDTO> findByCategory(String categoryName) {
+        List<Product> products = repository.findProductsByCategory(categoryName);
+        List<ProductDTO> answer = new ArrayList<>();
+
+        for (Product product: products) {
+            answer.add(
+                    ProductDTO.builder()
+                            .categoryId(product.getCategories().getId())
+                            .model(product.getModel())
+                            .title(product.getTitle())
+                            .salePrice(product.getSalePrice())
+                            .developer(product.getDeveloper())
+                            .photo(product.getPhoto())
+                            .stock(product.isStock())
+                            .percentageSale(product.getCategories().getSale().getSale())
+                            .price(product.getPrice())
+                            .build()
+            );
+        }
+
+        return answer;
     }
 }

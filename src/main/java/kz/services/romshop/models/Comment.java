@@ -1,7 +1,5 @@
 package kz.services.romshop.models;
 
-import kz.services.romshop.models.User;
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,7 +8,6 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -28,15 +25,11 @@ public class Comment {
     @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
-    private int rating;
+    private Integer rating;
     private String text;
     @CreationTimestamp
     private LocalDateTime dataComment;
-    @ElementCollection
-    @CollectionTable(name = "comment_advantages")
-    private List<String> advantages;
-    @ElementCollection
-    @CollectionTable(name = "comment_disadvantages")
-    private List<String> disadvantages;
+    // true - advantages, false - disadvantages
+    private boolean status;
     private String answerAdmin;
 }

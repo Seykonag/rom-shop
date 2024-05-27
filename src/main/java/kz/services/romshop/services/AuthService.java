@@ -56,7 +56,7 @@ public class AuthService {
         bonusService.createBonusScore(user);
 
         var jwt = jwtService.generateToken(user);
-        return new JwtAuthDTO(jwt);
+        return new JwtAuthDTO(jwt, registrationDTO.getUsername());
     }
 
     public JwtAuthDTO signIn(LoginDTO request) {
@@ -70,7 +70,7 @@ public class AuthService {
                 .loadUserByUsername(request.getUsername());
 
         var jwt = jwtService.generateToken(user);
-        return new JwtAuthDTO(jwt);
+        return new JwtAuthDTO(jwt, request.getUsername());
     }
 
     @Transactional

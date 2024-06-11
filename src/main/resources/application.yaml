@@ -4,9 +4,9 @@ spring:
       ddl-auto: update
     show-sql: true
   datasource:
-    url: jdbc:postgresql://localhost:5432/shop
-    username: postgres
-    password: komka123
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/shop }
+    username: ${SPRING_DATASOURCE_USERNAME:postgres }
+    password: ${SPRING_DATASOURCE_PASSWORD:komka123 }
     hikari:
       auto-commit: false
   flyway:

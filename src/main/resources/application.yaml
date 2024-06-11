@@ -1,3 +1,7 @@
+java:
+  runtime:
+    version: 17
+
 spring:
   jpa:
     hibernate:

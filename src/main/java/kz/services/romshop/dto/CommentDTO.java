@@ -12,6 +12,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 public class CommentDTO {
+    private String username;
+    private String firstName;
+    private String lastName;
     private Long idOrder;
     private Long idProduct;
     private Integer rating;

@@ -1,6 +1,6 @@
-package kz.services.romshop.models;
+package kz.services.romshop.dto;
 
-import jakarta.persistence.*;
+import kz.services.romshop.models.Order;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,22 +9,12 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
-@Entity
-@Table(name = "paid_orders")
-public class PaidOrder {
-    private static final String SEQ_NAME = "paid_order_seq";
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQ_NAME)
-    @SequenceGenerator(name = SEQ_NAME, sequenceName = SEQ_NAME, allocationSize = 1)
+public class PaypalOrderDTO {
     private Long id;
-
-    @OneToOne
-    @JoinColumn(name = "order_id")
-    private Order order;
+    private Long orderID;
     private String paymentID;
     private String payerId;
     private String email;

@@ -1,8 +1,6 @@
 package kz.services.romshop.controllers;
 
 import kz.services.romshop.dto.ProductDTO;
-import kz.services.romshop.models.Product;
-import kz.services.romshop.repositories.ProductRepository;
 import kz.services.romshop.services.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -24,8 +22,6 @@ public class ProductController {
         return service.getProduct(id);
     }
 
-
-
     @GetMapping("/{id}/bucket")
     public void addBucket(@PathVariable Long id, Principal principal) {
         if (principal == null) throw new RuntimeException("Не авторизованы");
@@ -43,7 +39,7 @@ public class ProductController {
     }
 
     @PostMapping("/getCategory")
-    public List<ProductDTO> getCategory(@RequestParam String categoryName) {
-        return service.findByCategory(categoryName);
+    public List<ProductDTO> getCategory(@RequestBody Long id) {
+        return service.findByCategory(id);
     }
 }

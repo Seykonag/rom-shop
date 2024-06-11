@@ -24,12 +24,16 @@ public class CategoryService {
     private final ProductRepository productRepository;
     private final CategoryRepository repository;
 
-    public void createCategory(CategoryDTO dto) {
+    public CategoryDTO createCategory(CategoryDTO dto) {
         Category category = Category.builder()
                 .title(dto.getTitle())
                 .build();
 
         repository.save(category);
+
+        dto.setId(category.getId());
+
+        return dto;
     }
 
     public void updateCategory(Long id, CategoryDTO dto) {
@@ -37,7 +41,17 @@ public class CategoryService {
     }
 
     @Transactional
-    public void deleteCategory(Long id) { repository.delete(repository.getReferenceById(id)); }
+    public Boolean deleteCategory(List<Long> ids) {
+        try {
+            for (Long id: ids) {
+                repository.delete(repository.getReferenceById(id));
+            }
+        } catch (RuntimeException exc) {
+            return false;
+        }
+
+        return true;
+    }
 
 
     public boolean isSaleCategory(Long id) {
@@ -67,9 +81,17 @@ public class CategoryService {
         List<CategoryDTO> answer = new ArrayList<>();
 
         for (Category category: categories) {
-            answer.add(new CategoryDTO(category.getTitle()));
+            answer.add(new CategoryDTO(category.getId() , category.getTitle()));
         }
 
         return answer;
+    }
+
+    public CategoryDTO get(Long id) {
+        Category category = repository.getReferenceById(id);
+        return CategoryDTO.builder()
+                .id(category.getId())
+                .title(category.getTitle())
+                .build();
     }
 }

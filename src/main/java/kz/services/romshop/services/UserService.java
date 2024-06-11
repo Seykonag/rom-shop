@@ -5,6 +5,7 @@ import kz.services.romshop.models.Role;
 import kz.services.romshop.models.User;
 import kz.services.romshop.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -33,6 +34,7 @@ public class UserService {
 
     private RegistrationDTO toDTO(User user) {
         return RegistrationDTO.builder()
+                .id(user.getId())
                 .username(user.getUsername())
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
@@ -65,8 +67,13 @@ public class UserService {
                 .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден"));
     }
 
-    public void delete(Long id) {
-        repository.delete(repository.getReferenceById(id));
+    public Boolean delete(List<Long> ids) {
+        try {
+            for (Long id: ids) repository.delete(repository.getReferenceById(id));
+        } catch (Exception exc) {
+            return false;
+        }
+        return true;
     }
 
     public void upgrade (RegistrationDTO dto, String username) {

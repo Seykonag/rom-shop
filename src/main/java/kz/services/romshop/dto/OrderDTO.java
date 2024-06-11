@@ -1,6 +1,5 @@
 package kz.services.romshop.dto;
 
-import kz.services.romshop.models.OrderDetails;
 import kz.services.romshop.models.OrderStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,6 +18,8 @@ import java.util.Map;
 public class OrderDTO {
     private Long id;
     private String username;
+    private String phone;
+    private String address;
     private LocalDateTime created;
     private LocalDateTime updated;
     private BigDecimal sum;

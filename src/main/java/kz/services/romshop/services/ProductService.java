@@ -11,6 +11,7 @@ import kz.services.romshop.utilits.CalculateUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 @Service
@@ -20,6 +21,7 @@ public class ProductService {
     private final ProductRepository repository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
+    private final CommentService commentService;
     private final CalculateUtils calculateUtils;
     private final BucketService bucketService;
     private final MarkService markService;
@@ -85,23 +87,38 @@ public class ProductService {
 
             if (request.getPrice() != null && request.getPrice().compareTo(product.getPrice()) != 0
                     && product.getCategories().getSale() != null) {
+                System.out.println(100);
                 product.setSalePrice(calculateUtils.calculateSale(
                         request.getPrice(),
                         categoryRepository.getReferenceById(
                                         product.getCategories().getId())
                                 .getSale().getSale()
                 ));
-
-                repository.save(product);
             }
 
-            repository.updateProduct(request, product);
+            if (request.getRealPhoto() != null) {
+                product.setPhoto(Base64.getDecoder().decode(request.getRealPhoto()));
+            }
 
+            request.setRealPhoto(null);
+
+            repository.save(product);
+            repository.updateProduct(request, product);
         } else throw new RuntimeException("Такого продукта не существует");
     }
 
     @Transactional
-    public void deleteProduct(Long id) { repository.delete(repository.getReferenceById(id)); }
+    public Boolean deleteProduct(List<Long> ids) {
+        try {
+            for (Long id: ids) {
+                repository.delete(repository.getReferenceById(id));
+            }
+        } catch (Exception exc) {
+            return false;
+        }
+
+        return true;
+    }
 
     public ProductDTO getProduct(Long id) {
         Product product = repository.getReferenceById(id);
@@ -119,6 +136,7 @@ public class ProductService {
                 .photo(product.getPhoto())
                 .price(product.getPrice())
                 .salePrice(product.getSalePrice())
+                .comments(commentService.findByProduct(product.getId()))
                 .build();
     }
 
@@ -137,24 +155,29 @@ public class ProductService {
         return products;
     }
 
-    public List<ProductDTO> findByCategory(String categoryName) {
-        List<Product> products = repository.findProductsByCategory(categoryName);
+    public List<ProductDTO> findByCategory(Long id) {
+        List<Product> products = repository.findProductsByCategory(id);
         List<ProductDTO> answer = new ArrayList<>();
 
         for (Product product: products) {
+            BigDecimal salePrice = product.getSalePrice() != null ? product.getSalePrice() : BigDecimal.ZERO;
+            int percentageSale = product.getCategories().getSale() != null ? product.getCategories().getSale().getSale() : 0;
+
             answer.add(
                     ProductDTO.builder()
+                            .id(product.getId())
                             .categoryId(product.getCategories().getId())
                             .model(product.getModel())
                             .title(product.getTitle())
-                            .salePrice(product.getSalePrice())
+                            .salePrice(salePrice)
                             .developer(product.getDeveloper())
                             .photo(product.getPhoto())
                             .stock(product.isStock())
-                            .percentageSale(product.getCategories().getSale().getSale())
+                            .percentageSale(percentageSale)
                             .price(product.getPrice())
                             .build()
             );
+
         }
 
         return answer;

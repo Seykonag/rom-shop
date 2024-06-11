@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @Builder
 public class BucketDetailsDTO {
+    private Long id;
     private String title;
     private Long productId;
     private BigDecimal price;
@@ -30,6 +31,7 @@ public class BucketDetailsDTO {
             this.percentageSale = product.getCategories().getSale().getSale();
         }
 
+        this.id = product.getId();
         this.price = product.getPrice();
         this.title = product.getTitle();
         this.productId = product.getId();

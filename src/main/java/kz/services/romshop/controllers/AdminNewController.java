@@ -9,10 +9,15 @@ import kz.services.romshop.services.CategoryService;
 import kz.services.romshop.services.ProductService;
 import kz.services.romshop.services.SaleService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/admin/new")
@@ -30,7 +35,15 @@ public class AdminNewController {
     public void createAdmin(@RequestBody RegistrationDTO request) { authenticationService.signUp(request, true); }
 
     @PostMapping("/category")
-    public void createCategory(@RequestBody CategoryDTO request) { categoryService.createCategory(request); }
+    public ResponseEntity<Map<String, Object>> createCategory(@RequestBody CategoryDTO request) {
+        CategoryDTO createdCategory = categoryService.createCategory(request);
+
+        // Wrap the response in a data map
+        Map<String, Object> response = new HashMap<>();
+        response.put("data", createdCategory);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
 
     @PostMapping("/product")
     public void createProduct(@RequestBody ProductDTO request) { productService.createProduct(request); }

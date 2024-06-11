@@ -5,12 +5,12 @@ import kz.services.romshop.services.ProductService;
 import kz.services.romshop.services.SaleService;
 import kz.services.romshop.services.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,31 +21,37 @@ public class AdminDeleteController {
     private final CategoryService categoryService;
     private final SaleService saleService;
 
-    @GetMapping("/client/{id}")
-    public void deleteClient(@PathVariable Long id, Principal principal) {
-        if (principal == null) throw new RuntimeException("Не авторизованы");
+    @PostMapping("/user")
+    public ResponseEntity<Boolean> deleteClient(@RequestBody List<Long> ids, Principal principal) {
+        if (principal == null) {
+            throw new RuntimeException("Не авторизованы");
+        }
 
-        userService.delete(id);
+        boolean deleted = userService.delete(ids);
+        return ResponseEntity.status(HttpStatus.OK).body(deleted);
     }
 
-    @GetMapping("/category/{id}")
-    public void deleteCategory(@PathVariable Long id, Principal principal) {
+    @PostMapping("/category")
+    public ResponseEntity<Boolean> deleteCategory(@RequestBody List<Long> ids, Principal principal) {
         if (principal == null) throw new RuntimeException("Не авторизованы");
 
-        categoryService.deleteCategory(id);
+        boolean deleted = categoryService.deleteCategory(ids);
+        return ResponseEntity.status(HttpStatus.OK).body(deleted);
     }
 
-    @GetMapping("/product/{id}")
-    public void deleteProduct(@PathVariable Long id, Principal principal) {
+    @PostMapping("/product")
+    public ResponseEntity<Boolean> deleteProduct(@RequestBody List<Long> ids, Principal principal) {
         if (principal == null) throw new RuntimeException("Не авторизованы");
 
-        productService.deleteProduct(id);
+        boolean deleted = productService.deleteProduct(ids);
+        return ResponseEntity.status(HttpStatus.OK).body(deleted);
     }
 
-    @GetMapping("/sale/{id}")
-    public void deleteSale(@PathVariable Long id, Principal principal) {
+    @PostMapping("/sale")
+    public ResponseEntity<Boolean> deleteSale(@RequestBody List<Long> ids, Principal principal) {
         if (principal == null) throw new RuntimeException("Не авторизованы");
 
-        saleService.deleteSale(id);
+        boolean deleted = saleService.deleteSale(ids);
+        return ResponseEntity.status(HttpStatus.OK).body(deleted);
     }
 }

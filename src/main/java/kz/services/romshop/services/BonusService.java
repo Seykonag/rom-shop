@@ -20,13 +20,20 @@ public class BonusService {
     @Transactional
     public BonusScore createBonusScore(User user) {
         BonusScore bonusScore = new BonusScore();
-        bonusScore.setId(user.getId());
-        bonusScore.setUser(user);
-        bonusScore.setSum(new BigDecimal(0));
-        user.setBonusScore(bonusScore);
+        bonusScore.setId(user.getId()); // Присваиваем id BonusScore таким же, как у пользователя
+        bonusScore.setSum(BigDecimal.ZERO);
+        bonusScore.setUser(user);// Можно использовать константу BigDecimal.ZERO
+
+        // Сохраняем BonusScore перед сохранением User, чтобы избежать проблем с целостностью данных
+        BonusScore savedBonusScore = repository.save(bonusScore);
+
+        // Присваиваем сохраненный BonusScore пользователю
+        user.setBonusScore(savedBonusScore);
         userRepository.save(user);
-        return repository.save(bonusScore);
+
+        return savedBonusScore;
     }
+
 
     public void additionBonus(User user, BigDecimal sum) {
         BonusScore bonusScore = repository.findByUser(user);

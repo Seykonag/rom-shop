@@ -24,5 +24,6 @@ public class ProductDTO {
     private String realPhoto;
     private byte[] photo;
     private boolean stock;
+    private List<CommentDTO> comments;
     private Long categoryId;
 }

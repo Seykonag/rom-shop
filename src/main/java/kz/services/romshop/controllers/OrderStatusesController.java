@@ -34,12 +34,4 @@ public class OrderStatusesController {
 
     @GetMapping("/closedStatus")
     public List<OrderDTO> closedOrders() { return service.getOrderStatus(OrderStatus.CLOSED); }
-
-    /*
-    @GetMapping("/magicpay/{id}")
-    public void magicPayOrder(@PathVariable Long id) {
-        service.paidOrder(id);
-    }
-    */
-
 }

@@ -30,12 +30,19 @@ public class BucketService {
     @Transactional
     public Bucket createBucket(User user) {
         Bucket bucket = new Bucket();
-        bucket.setId(user.getId());
+        bucket.setId(user.getId()); // Присваиваем id Bucket таким же, как у пользователя
         bucket.setUser(user);
-        user.setBucket(bucket);
+
+        // Сохраняем Bucket перед сохранением User, чтобы избежать проблем с целостностью данных
+        Bucket savedBucket = bucketRepository.save(bucket);
+
+        // Присваиваем сохраненный Bucket пользователю
+        user.setBucket(savedBucket);
         userRepository.save(user);
-        return bucketRepository.save(bucket);
+
+        return savedBucket;
     }
+
 
     public void addProducts(Bucket bucket, List<Long> productId) {
         List<Product> products = bucket.getProducts();
@@ -76,6 +83,25 @@ public class BucketService {
         bucketDTO.aggregate();
 
         return bucketDTO;
+    }
+
+    public void deleteProduct(String username, List<Long> ids) {
+        Bucket bucket = bucketRepository.getReferenceByUserUsername(username);
+        List<Product> products = bucket.getProducts();
+        List<Product> deleteProducts = new ArrayList<>();
+
+        for (Long id: ids) deleteProducts.add(productRepository.getReferenceById(id));
+
+        products.removeAll(deleteProducts);
+
+        bucketRepository.save(bucket);
+    }
+
+    public void clear(String username) {
+        Bucket bucket = bucketRepository.getReferenceByUserUsername(username);
+        bucket.setProducts(null);
+
+        bucketRepository.save(bucket);
     }
 
     private List<Product> getCollectRefProductsById(List<Long> productId) {

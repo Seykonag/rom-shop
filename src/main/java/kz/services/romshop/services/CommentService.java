@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -30,7 +31,8 @@ public class CommentService {
         boolean approved = false;
 
         for (OrderDetails details: order.getDetails()) {
-            approved = details.getProduct() == product;
+            approved = Objects.equals(details.getProduct().getId(), product.getId());
+            if (approved) break;
         }
 
         if (!approved) throw new RuntimeException("Продукта нет в заказе");
@@ -55,6 +57,7 @@ public class CommentService {
         comments.add(newComment);
 
         product.setComment(comments);
+        repository.save(newComment);
         productRepository.save(product);
     }
 
@@ -77,6 +80,9 @@ public class CommentService {
         for (Comment comment: comments) {
             list.add(
                     CommentDTO.builder()
+                            .firstName(comment.getUser().getFirstName())
+                            .lastName(comment.getUser().getLastName())
+                            .username(comment.getUser().getUsername())
                             .rating(comment.getRating())
                             .data(comment.getDataComment())
                             .text(comment.getText())

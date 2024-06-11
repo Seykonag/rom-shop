@@ -12,6 +12,7 @@ import kz.services.romshop.repositories.OrderRepository;
 import kz.services.romshop.repositories.ProductRepository;
 import kz.services.romshop.repositories.UserRepository;
 import kz.services.romshop.utilits.CalculateUtils;
+import kz.services.romshop.utilits.CurrencyConverter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -50,6 +51,15 @@ public class OrderService {
         repository.save(order);
     }
 
+    public List<OrderDTO> getAll() {
+        List<Order> orders = repository.findAll();
+        List<OrderDTO> orderDTOS = new ArrayList<>();
+
+        for (Order order: orders) orderDTOS.add(mapToOrderDTO(order));
+
+        return orderDTOS;
+    }
+
     public List<OrderDTO> myOrders(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Not user"));
@@ -85,7 +95,20 @@ public class OrderService {
         }
     }
 
-    //test variation
+    public void confirmOrder(Map<Long, Boolean> confirms, String username) {
+        User user = userRepository.getReferenceByUsername(username);
+        Long key = confirms.keySet().iterator().next();
+
+        Order order = repository.getReferenceById(key);
+        if (order.getUser() != user) throw new RuntimeException("Это не ваш заказ");
+
+        if (order.getStatus() != OrderStatus.NEW) throw new RuntimeException("Заказ не правильно обработан");
+        if (confirms.get(key)) order.setStatus(OrderStatus.APPROVED);
+        else order.setStatus(OrderStatus.CANCELED);
+        repository.save(order);
+
+    }
+
     @Transactional
     public Payment paidOrder(PaypalPayDTO dto) throws PayPalRESTException {
         Order order = repository.getReferenceById(dto.getIdOrder());
@@ -93,12 +116,14 @@ public class OrderService {
         if (order.getStatus() != OrderStatus.APPROVED) throw new RuntimeException("Заказ не одобрен");
 
         BigDecimal paidSum = bonusService.expendBonus(order);
+        CurrencyConverter converter = new CurrencyConverter();
+        BigDecimal paidSumInRUB = paidSum.multiply(new BigDecimal(0.19205));
 
         if (paidSum.compareTo(new BigDecimal(0)) > 0) {
 
             return paypalService.createPayment(
-                    paidSum.doubleValue(),
-                    dto.getCurrency(),
+                    paidSumInRUB.doubleValue(),
+                    "RUB",
                     "paypal",
                     "sale",
                     order.getId().toString(),
@@ -134,6 +159,9 @@ public class OrderService {
     public OrderDTO mapToOrderDTO(Order order) {
         return OrderDTO.builder()
                 .id(order.getId())
+                .phone(order.getUser().getPhone())
+                .address(order.getAddress())
+                .username(order.getUser().getUsername())
                 .sum(order.getSum())
                 .details(buildDetailsDTO(order.getDetails()))
                 .created(order.getCreated())
@@ -168,6 +196,7 @@ public class OrderService {
 
         for (Map.Entry<Long, Integer> entry : products.entrySet()) {
             Product product = productRepository.getReferenceById(entry.getKey());
+            if (!product.isStock()) continue;
             OrderDetails orderDetails = new OrderDetails();
             orderDetails.setOrder(order);
             orderDetails.setProduct(product);
@@ -181,6 +210,10 @@ public class OrderService {
         return list;
     }
 
-    public Order getOrderById(Long id) { return repository.getReferenceById(id); }
+    public OrderDTO getOrderById(Long id) {
+        return mapToOrderDTO(repository.getReferenceById(id));
+    }
+
+    public Order getOrder(Long id) {return repository.getReferenceById(id);}
 }
 

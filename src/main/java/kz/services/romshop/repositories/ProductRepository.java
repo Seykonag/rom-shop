@@ -14,6 +14,7 @@ import java.util.Objects;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
+    List<Product> findByTitleContainingIgnoreCase(String name);
     default void updateProduct(ProductDTO productDTO, Product product) {
         boolean changed = false;
 

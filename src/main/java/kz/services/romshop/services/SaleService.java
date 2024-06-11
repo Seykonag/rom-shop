@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -50,15 +52,39 @@ public class SaleService {
     }
 
     @Transactional
-    public void deleteSale(Long id) {
-        Sale sale = repository.getReferenceById(id);
-        Long categoryId = sale.getCategory().getId();
+    public Boolean deleteSale(List<Long> ids) {
+        try {
+            for (Long id: ids) {
+                Sale sale = repository.getReferenceById(id);
+                Long categoryId = sale.getCategory().getId();
 
-        List<Product> products = productRepository.findProductsByCategory(categoryId);
-        for (Product product: products) product.setSalePrice(null);
+                List<Product> products = productRepository.findProductsByCategory(categoryId);
+                for (Product product: products) product.setSalePrice(null);
 
-        categoryRepository.getReferenceById(categoryId).setSale(null);
-        repository.delete(sale);
+                categoryRepository.getReferenceById(categoryId).setSale(null);
+                repository.delete(sale);
+            }
+        } catch (RuntimeException exc) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public List<SaleDTO> getAll() {
+        List<Sale> sales = repository.findAll();
+        List<SaleDTO> saleDTOS = new ArrayList<>();
+
+        for (Sale sale: sales) {
+            saleDTOS.add(SaleDTO.builder()
+                            .id(sale.getId())
+                            .sale(sale.getSale())
+                            .created(sale.getCreated().toString())
+                            .ended(sale.getEnded().toString())
+                            .categoryId(sale.getCategory().getId())
+                            .build());
+        }
+        return saleDTOS;
     }
 
     @Scheduled(fixedRate = 300000)
@@ -70,8 +96,20 @@ public class SaleService {
         for (Sale sale: sales) {
             int check = nowDate.compareTo(sale.getEnded());
 
-            if (check >= 0) deleteSale(sale.getId());
+            if (check >= 0) deleteSale(Collections.singletonList(sale.getId()));
         }
+    }
+
+    public SaleDTO get(Long id) {
+        Sale sale = repository.getReferenceById(id);
+
+        return SaleDTO.builder()
+                .id(sale.getId())
+                .categoryId(sale.getCategory().getId())
+                .created(sale.getCreated().toString())
+                .ended(sale.getEnded().toString())
+                .sale(sale.getSale())
+                .build();
     }
 
     // Пример строки для парсинга "2024-04-15T10:15:30"

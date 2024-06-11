@@ -18,7 +18,6 @@ import java.security.Principal;
 public class AdminEditController {
     private final ProductService productService;
     private final CategoryService categoryService;
-    private final SaleService saleService;
 
     @PostMapping("/category/{id}")
     public void editCategory(@PathVariable Long id, @RequestBody CategoryDTO request, Principal principal) {

@@ -30,11 +30,17 @@ public class MarkService {
     @Transactional
     public Mark createMark(User user) {
         Mark mark = new Mark();
-        mark.setId(user.getId());
+        mark.setId(user.getId()); // Присваиваем id Mark таким же, как у пользователя
         mark.setUser(user);
-        user.setMark(mark);
+
+        // Сохраняем Mark перед сохранением User, чтобы избежать проблем с целостностью данных
+        Mark savedMark = markRepository.save(mark);
+
+        // Присваиваем сохраненный Mark пользователю
+        user.setMark(savedMark);
         userRepository.save(user);
-        return markRepository.save(mark);
+
+        return savedMark;
     }
 
     public void addProducts(Mark mark, List<Long> productId) {

@@ -1,7 +1,7 @@
 package kz.services.romshop.controllers;
 
-import kz.services.romshop.dto.CategoryDTO;
-import kz.services.romshop.services.CategoryService;
+import kz.services.romshop.dto.SaleDTO;
+import kz.services.romshop.services.SaleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,12 +12,12 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/category")
-public class CategoryController {
-    private final CategoryService service;
+@RequestMapping("/sale")
+public class SaleController {
+    private final SaleService service;
     @GetMapping("/all")
-    public List<CategoryDTO> getAll() { return service.getAll(); }
+    public List<SaleDTO> getAll() { return service.getAll(); }
 
     @GetMapping("/{id}")
-    public CategoryDTO get(@PathVariable Long id) { return service.get(id); }
+    public SaleDTO get(@PathVariable Long id) { return service.get(id); }
 }

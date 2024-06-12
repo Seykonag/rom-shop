@@ -127,8 +127,8 @@ public class OrderService {
                     "paypal",
                     "sale",
                     order.getId().toString(),
-                    "http://localhost:8080/pay/cancel",
-                    "http://localhost:8080/pay/success"
+                    "https://rom-shop-0c9c08d95305.herokuapp.com/pay/cancel",
+                    "https://rom-shop-0c9c08d95305.herokuapp.com/pay/success"
                     );
         }
 

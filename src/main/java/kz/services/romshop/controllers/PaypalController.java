@@ -47,7 +47,7 @@ public class PaypalController {
                                         @RequestParam("PayerID") String payerId) {
         paidOrderService.processPaypal(paymentId, payerId);
         return ResponseEntity.status(HttpStatus.FOUND)
-                .header("Location", "http://localhost:3000/myorders")
+                .header("Location", "http://195.133.198.25:3000/myorders")
                 .build();
     }
 

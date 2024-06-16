@@ -2,8 +2,6 @@ package kz.services.romshop.repositories;
 
 import kz.services.romshop.dto.ProductDTO;
 import kz.services.romshop.models.Product;
-import kz.services.romshop.utilits.CalculateUtils;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

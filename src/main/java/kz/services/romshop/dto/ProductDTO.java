@@ -1,6 +1,5 @@
 package kz.services.romshop.dto;
 
-import kz.services.romshop.models.Category;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

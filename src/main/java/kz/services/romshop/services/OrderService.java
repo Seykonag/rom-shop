@@ -156,6 +156,12 @@ public class OrderService {
         repository.save(order);
     }
 
+    public void editAddressOrder(Long id, String address) {
+        Order order = repository.getReferenceById(id);
+        order.setAddress(address);
+        repository.save(order);
+    }
+
     public OrderDTO mapToOrderDTO(Order order) {
         return OrderDTO.builder()
                 .id(order.getId())

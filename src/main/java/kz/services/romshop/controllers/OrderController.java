@@ -42,4 +42,9 @@ public class OrderController {
 
     @GetMapping("/myOrders")
     public List<OrderDTO> myOrders(Principal principal) { return orderService.myOrders(principal.getName()); }
+
+    @PostMapping("/editAddress/{id}")
+    public void editAddressOrder(@PathVariable Long id, @RequestBody String address) {
+        orderService.editAddressOrder(id, address);
+    }
 }

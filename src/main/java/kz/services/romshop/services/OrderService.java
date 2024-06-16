@@ -116,7 +116,6 @@ public class OrderService {
         if (order.getStatus() != OrderStatus.APPROVED) throw new RuntimeException("Заказ не одобрен");
 
         BigDecimal paidSum = bonusService.expendBonus(order);
-        CurrencyConverter converter = new CurrencyConverter();
         BigDecimal paidSumInRUB = paidSum.multiply(new BigDecimal(0.19205));
 
         if (paidSum.compareTo(new BigDecimal(0)) > 0) {

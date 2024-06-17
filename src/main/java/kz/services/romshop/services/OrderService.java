@@ -14,6 +14,7 @@ import kz.services.romshop.repositories.UserRepository;
 import kz.services.romshop.utilits.CalculateUtils;
 import kz.services.romshop.utilits.CurrencyConverter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -32,6 +33,12 @@ public class OrderService {
     private final UserRepository userRepository;
     private final OrderDetailsRepository orderDetailsRepository;
     private final ProductRepository productRepository;
+
+    @Value("${paypal.client.id}")
+    private String clientId;
+
+    @Value("${paypal.client.secret}")
+    private String clientSecret;
 
     @Transactional
     public void createOrder(String username, Map<Long, Integer> productID) {
@@ -111,6 +118,9 @@ public class OrderService {
 
     @Transactional
     public Payment paidOrder(PaypalPayDTO dto) throws PayPalRESTException {
+        System.out.println(clientId);
+        System.out.println(clientSecret);
+
         Order order = repository.getReferenceById(dto.getIdOrder());
 
         if (order.getStatus() != OrderStatus.APPROVED) throw new RuntimeException("Заказ не одобрен");

@@ -15,4 +15,5 @@ public class PaypalPayDTO {
     private String currency;
     private String method;
     private String description;
+    private Boolean bonus;
 }

@@ -118,14 +118,15 @@ public class OrderService {
 
     @Transactional
     public Payment paidOrder(PaypalPayDTO dto) throws PayPalRESTException {
-        System.out.println(clientId);
-        System.out.println(clientSecret);
+        BigDecimal paidSum = null;
 
         Order order = repository.getReferenceById(dto.getIdOrder());
 
         if (order.getStatus() != OrderStatus.APPROVED) throw new RuntimeException("Заказ не одобрен");
 
-        BigDecimal paidSum = bonusService.expendBonus(order);
+        if (dto.getBonus()) paidSum = bonusService.expendBonus(order);
+        else paidSum = order.getSum();
+
         BigDecimal paidSumInRUB = paidSum.multiply(new BigDecimal(0.19205));
 
         if (paidSum.compareTo(new BigDecimal(0)) > 0) {

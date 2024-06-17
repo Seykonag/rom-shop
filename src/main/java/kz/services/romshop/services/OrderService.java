@@ -124,8 +124,10 @@ public class OrderService {
 
         if (order.getStatus() != OrderStatus.APPROVED) throw new RuntimeException("Заказ не одобрен");
 
-        if (dto.getBonus()) paidSum = bonusService.expendBonus(order);
-        else paidSum = order.getSum();
+        if (dto.getBonus() != null) {
+            if (dto.getBonus()) paidSum = bonusService.expendBonus(order);
+            else paidSum = order.getSum();
+        }
 
         BigDecimal paidSumInRUB = paidSum.multiply(new BigDecimal(0.19205));
 
@@ -141,6 +143,8 @@ public class OrderService {
                     "https://rom-shop-0c9c08d95305.herokuapp.com/pay/success"
                     );
         }
+
+        order.setStatus(OrderStatus.PAID);
 
         return null;
     }

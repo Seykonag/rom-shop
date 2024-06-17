@@ -27,7 +27,7 @@ public class PaypalController {
         try {
             Payment payment = orderService.paidOrder(request);
 
-            if (payment == null) return cancel();
+            if (payment == null) return "Заказ полностью оплачен бонусами";
 
             for (Links link: payment.getLinks()) {
                 if(link.getRel().equals("approval_url")) {

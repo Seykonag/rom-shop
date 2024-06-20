@@ -122,7 +122,11 @@ public class OrderService {
 
         Order order = repository.getReferenceById(dto.getIdOrder());
 
+        order.setStatus(OrderStatus.PAID);
+
         if (order.getStatus() != OrderStatus.APPROVED) throw new RuntimeException("Заказ не одобрен");
+
+
 
         if (dto.getBonus() != null) {
             if (dto.getBonus()) paidSum = bonusService.expendBonus(order);
@@ -144,7 +148,7 @@ public class OrderService {
                     );
         }
 
-        order.setStatus(OrderStatus.PAID);
+
 
         return null;
     }

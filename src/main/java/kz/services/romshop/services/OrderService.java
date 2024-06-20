@@ -123,6 +123,7 @@ public class OrderService {
         Order order = repository.getReferenceById(dto.getIdOrder());
 
         order.setStatus(OrderStatus.PAID);
+        repository.save((order));
 
         if (order.getStatus() != OrderStatus.APPROVED) throw new RuntimeException("Заказ не одобрен");
 
@@ -147,8 +148,6 @@ public class OrderService {
                     "https://rom-shop-0c9c08d95305.herokuapp.com/pay/success"
                     );
         }
-
-
 
         return null;
     }

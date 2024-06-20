@@ -129,7 +129,7 @@ public class OrderService {
             else paidSum = order.getSum();
         }
 
-        BigDecimal paidSumInRUB = paidSum.multiply(new BigDecimal(0.19205));
+        BigDecimal paidSumInRUB = paidSum.multiply(new BigDecimal(0.17068));
 
         if (paidSum.compareTo(new BigDecimal(0)) > 0) {
 

@@ -57,6 +57,8 @@ public class PaidOrderService {
                                 String firstName = payerInfoNode.path("first_name").asText();
                                 String lastName = payerInfoNode.path("last_name").asText();
 
+                                orderService.setOrderStatusPaid(Long.parseLong(description));
+
                                 JsonNode linksNode = relatedResourcesNode.path("links");
                                 String href = "";
                                 for (JsonNode linkNode : linksNode) {
@@ -80,8 +82,6 @@ public class PaidOrderService {
                                         .created(LocalDateTime.parse(relatedResourcesNode.path("create_time").asText(), formatter))
                                         .updated(LocalDateTime.parse(relatedResourcesNode.path("update_time").asText(), formatter))
                                         .build();
-
-                                orderService.setOrderStatusPaid(Long.parseLong(description));
                             }
                         }
                     }

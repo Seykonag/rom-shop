@@ -23,7 +23,7 @@ public class OrderController {
     }
 
     @GetMapping("/{id}")
-    public OrderDTO get(@PathVariable Long id) { return orderService.getOrderById(id); }
+    public OrderDTO get(@PathVariable Long id) { return orderService.getOrderDto(id); }
 
     @PostMapping("/create")
     public void createOrder(@RequestBody OrderDTO orderDTO, Principal principal) {

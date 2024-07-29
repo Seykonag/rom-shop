@@ -1,14 +1,11 @@
 package kz.services.romshop.services;
 
 import kz.services.romshop.dto.RegistrationDTO;
-import kz.services.romshop.models.Role;
+import kz.services.romshop.mappers.UserMapper;
 import kz.services.romshop.models.User;
 import kz.services.romshop.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.orm.jpa.JpaSystemException;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +16,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class UserService {
+    private final UserMapper userMapper;
     private final UserRepository repository;
     private final PasswordEncoder passwordEncoder;
 
@@ -28,26 +26,8 @@ public class UserService {
 
     public List<RegistrationDTO> getAll() {
         return repository.findAll().stream()
-                .map(this::toDTO)
+                .map(userMapper::toDto)
                 .collect(Collectors.toList());
-    }
-
-    private RegistrationDTO toDTO(User user) {
-        return RegistrationDTO.builder()
-                .id(user.getId())
-                .username(user.getUsername())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .email(user.getEmail())
-                .phone(user.getPhone())
-                .fax(user.getFax())
-                .company(user.getCompany())
-                .address(user.getAddress())
-                .country(user.getCountry())
-                .region(user.getRegion())
-                .index(user.getIndex())
-                .newsletter(user.isNewsletter())
-                .build();
     }
 
     public User create(User user) {
@@ -62,10 +42,7 @@ public class UserService {
         return save(user);
     }
 
-    public User getByUsername(String username) {
-        return repository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден"));
-    }
+    public User getByUsername(String username) { return repository.getReferenceByUsername(username); }
 
     public Boolean delete(List<Long> ids) {
         try {
@@ -73,28 +50,16 @@ public class UserService {
         } catch (Exception exc) {
             return false;
         }
+
         return true;
     }
 
-    public void upgrade (RegistrationDTO dto, String username) {
-        if (repository.findByUsername(username).isPresent()) {
-            updateProfile(dto, repository.findByUsername(username).get());
-        } else throw new RuntimeException("Not found user");
-    }
-
-    private void updateProfile(RegistrationDTO dto, User savedUser) {
+    public void updateProfile(RegistrationDTO dto, String username) {
+        User savedUser = repository.getReferenceByUsername(username);
         boolean changed = false;
-
-        if (savedUser == null) throw new RuntimeException("User not found by name " + dto.getUsername());
-
 
         Field[] dtoFields = dto.getClass().getDeclaredFields();
         Field[] savedFields = savedUser.getClass().getDeclaredFields();
-
-        if (repository.findByUsername(dto.getUsername()).isPresent()) {
-            savedUser = repository.findByUsername(dto.getUsername()).get();
-        }
-
 
         for (Field dtoField : dtoFields) {
             for (Field savedField : savedFields) {
@@ -128,41 +93,10 @@ public class UserService {
     }
 
     public RegistrationDTO getProfile(String username) {
-        User user = null;
-        if (repository.findByUsername(username).isPresent()) {
-            user = repository.findByUsername(username).get();
-        }
-
-        assert user != null;
-        return RegistrationDTO.builder()
-                .username(user.getUsername())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .email(user.getEmail())
-                .phone(user.getPhone())
-                .fax(user.getFax())
-                .company(user.getCompany())
-                .address(user.getAddress())
-                .city(user.getCity())
-                .country(user.getCountry())
-                .region(user.getRegion())
-                .index(user.getIndex())
-                .newsletter(user.isNewsletter())
-                .build();
+        return userMapper.toDto(
+                repository.getReferenceByUsername(username)
+        );
     }
 
     public UserDetailsService userDetailsService() { return this::getByUsername; }
-
-    public User getCurrentUser() {
-        var username = SecurityContextHolder.getContext().getAuthentication().getName();
-        return getByUsername(username);
-    }
-
-
-    @Deprecated
-    public void getAdmin() {
-        var user = getCurrentUser();
-        user.setRole(Role.ROLE_ADMIN);
-        save(user);
-    }
 }

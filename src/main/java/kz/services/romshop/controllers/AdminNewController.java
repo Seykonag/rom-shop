@@ -28,7 +28,7 @@ public class AdminNewController {
     private final CategoryService categoryService;
     private final SaleService saleService;
 
-    @PostMapping("user-client")
+    @PostMapping("/user-client")
     public void createClient(@RequestBody RegistrationDTO request) { authenticationService.signUp(request, false); }
 
     @PostMapping("/user-admin")
@@ -36,13 +36,7 @@ public class AdminNewController {
 
     @PostMapping("/category")
     public ResponseEntity<Map<String, Object>> createCategory(@RequestBody CategoryDTO request) {
-        CategoryDTO createdCategory = categoryService.createCategory(request);
-
-        // Wrap the response in a data map
-        Map<String, Object> response = new HashMap<>();
-        response.put("data", createdCategory);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return categoryService.createCategory(request);
     }
 
     @PostMapping("/product")

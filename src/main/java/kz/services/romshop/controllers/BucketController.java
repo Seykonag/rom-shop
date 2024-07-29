@@ -27,7 +27,5 @@ public class BucketController {
     }
 
     @GetMapping("/clear")
-    public void cleat(Principal principal) {
-        bucketService.clear(principal.getName());
-    }
+    public void cleat(Principal principal) { bucketService.clear(principal.getName()); }
 }

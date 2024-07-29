@@ -2,6 +2,7 @@ package kz.services.romshop.services;
 
 import jakarta.transaction.Transactional;
 import kz.services.romshop.dto.SaleDTO;
+import kz.services.romshop.mappers.SaleMapper;
 import kz.services.romshop.models.Product;
 import kz.services.romshop.models.Sale;
 import kz.services.romshop.repositories.CategoryRepository;
@@ -22,6 +23,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SaleService {
     private final CategoryService categoryService;
+    private final SaleMapper saleMapper;
     private final ProductRepository productRepository;
     private final SaleRepository repository;
     private final CategoryRepository categoryRepository;
@@ -30,7 +32,7 @@ public class SaleService {
     public void createSale(SaleDTO dto) {
         int checkData = parseData(dto.getCreated()).compareTo(parseData(dto.getEnded()));
 
-        if (repository.findByCategoryId(dto.getCategoryId())) {
+        if (repository.existsByCategoryId(dto.getCategoryId())) {
             throw new RuntimeException("Скидка на категорию уже существует");
         }
 
@@ -58,7 +60,7 @@ public class SaleService {
                 Sale sale = repository.getReferenceById(id);
                 Long categoryId = sale.getCategory().getId();
 
-                List<Product> products = productRepository.findProductsByCategory(categoryId);
+                List<Product> products = productRepository.findByCategoriesId(categoryId);
                 for (Product product: products) product.setSalePrice(null);
 
                 categoryRepository.getReferenceById(categoryId).setSale(null);
@@ -101,30 +103,20 @@ public class SaleService {
     }
 
     public SaleDTO get(Long id) {
-        Sale sale = repository.getReferenceById(id);
-
-        return SaleDTO.builder()
-                .id(sale.getId())
-                .categoryId(sale.getCategory().getId())
-                .created(sale.getCreated().toString())
-                .ended(sale.getEnded().toString())
-                .sale(sale.getSale())
-                .build();
+        return saleMapper.fromSale(repository.getReferenceById(id));
     }
 
     // Пример строки для парсинга "2024-04-15T10:15:30"
     private LocalDateTime parseData(String data) {
         if (data == null) throw new RuntimeException("Проблемы с датой");
 
-        LocalDateTime localDateTime = null;
-
         try {
-            DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
-            localDateTime = LocalDateTime.parse(data, formatter);
+            return LocalDateTime.parse(
+                    data,
+                    DateTimeFormatter.ISO_LOCAL_DATE_TIME
+            );
         } catch (DateTimeParseException exc) {
             throw new RuntimeException("Не правильный формат даты и времени");
         }
-
-        return localDateTime;
     }
 }

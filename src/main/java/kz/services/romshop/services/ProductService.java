@@ -11,6 +11,7 @@ import kz.services.romshop.utilits.CalculateUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -29,11 +30,7 @@ public class ProductService {
 
     @Transactional
     public void addToUserBucket(Long productId, String username) {
-        User user;
-
-        if (userRepository.findByUsername(username).isPresent()) {
-            user = userRepository.findByUsername(username).get();
-        } else throw new RuntimeException("Пользователь не найден");
+        User user = userRepository.getReferenceByUsername(username);
 
         Bucket bucket =user.getBucket();
 
@@ -43,11 +40,7 @@ public class ProductService {
 
     @Transactional
     public void addToUserMark(Long productId, String username) {
-        User user;
-
-        if (userRepository.findByUsername(username).isPresent()) {
-            user = userRepository.findByUsername(username).get();
-        } else throw new RuntimeException("Пользователь не найден");
+        User user = userRepository.getReferenceByUsername(username);
 
         Mark mark =user.getMark();
 
@@ -57,7 +50,6 @@ public class ProductService {
 
     @Transactional
     public void createProduct(ProductDTO productDTO) {
-        if (productDTO.getCategoryId() == null) throw new RuntimeException("У продукта нет категории");
         Category category = categoryRepository.getReferenceById(productDTO.getCategoryId());
 
         System.out.println(productDTO.getRealPhoto());
@@ -82,29 +74,9 @@ public class ProductService {
 
     @Transactional
     public void upgradeProduct(Long id, ProductDTO request) {
-        if (repository.findById(id).isPresent()) {
             Product product = repository.getReferenceById(id);
-
-            if (request.getPrice() != null && request.getPrice().compareTo(product.getPrice()) != 0
-                    && product.getCategories().getSale() != null) {
-                System.out.println(100);
-                product.setSalePrice(calculateUtils.calculateSale(
-                        request.getPrice(),
-                        categoryRepository.getReferenceById(
-                                        product.getCategories().getId())
-                                .getSale().getSale()
-                ));
-            }
-
-            if (request.getRealPhoto() != null) {
-                product.setPhoto(Base64.getDecoder().decode(request.getRealPhoto()));
-            }
-
-            request.setRealPhoto(null);
-
+            updateProductsFields(product, request);
             repository.save(product);
-            repository.updateProduct(request, product);
-        } else throw new RuntimeException("Такого продукта не существует");
     }
 
     @Transactional
@@ -156,7 +128,7 @@ public class ProductService {
     }
 
     public List<ProductDTO> findByCategory(Long id) {
-        List<Product> products = repository.findProductsByCategory(id);
+        List<Product> products = repository.findByCategoriesId(id);
         List<ProductDTO> answer = new ArrayList<>();
 
         for (Product product: products) {
@@ -181,5 +153,52 @@ public class ProductService {
         }
 
         return answer;
+    }
+
+    private void updateProductsFields(Product product, ProductDTO request) {
+        if (request.getPrice() != null && request.getPrice().compareTo(product.getPrice()) != 0
+                && product.getCategories().getSale() != null) {
+            product.setSalePrice(calculateUtils.calculateSale(
+                    request.getPrice(),
+                    categoryRepository.getReferenceById(
+                                    product.getCategories().getId())
+                            .getSale().getSale()
+            ));
+        }
+
+        if (request.getRealPhoto() != null) {
+            product.setPhoto(Base64.getDecoder().decode(request.getRealPhoto()));
+        }
+
+        updateProductDetails(product, request);
+    }
+
+    private void updateProductDetails(Product product, ProductDTO request) {
+        boolean changed = false;
+
+        Field[] dtoFields = request.getClass().getDeclaredFields();
+        Field[] productFields = product.getClass().getDeclaredFields();
+
+        for (Field dtoField : dtoFields) {
+            for (Field productField : productFields) {
+                if (dtoField.getName().equals(productField.getName())) {
+                    dtoField.setAccessible(true);
+                    productField.setAccessible(true);
+
+                    try {
+                        Object dtoValue = dtoField.get(request);
+                        Object savedValue = productField.get(product);
+
+                        if (dtoValue != null && !dtoValue.equals(savedValue)) {
+                            productField.set(product, dtoValue);
+                            changed = true;
+                        }
+                    } catch (IllegalAccessException exc) {
+                        throw new RuntimeException("Продукт не изменен");
+                    }
+                }
+            }
+        }
+        product.setStock(true); //разобраться почему тру наличие при апдейте
     }
 }

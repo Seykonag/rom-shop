@@ -25,18 +25,10 @@ public class PaypalController {
     @PostMapping
     public String paid(@RequestBody PaypalPayDTO request) {
         try {
-            Payment payment = orderService.paidOrder(request);
-
-            if (payment == null) return "Заказ полностью оплачен бонусами";
-
-            for (Links link: payment.getLinks()) {
-                if(link.getRel().equals("approval_url")) {
-                    return link.getHref();
-                }
-            }
-        } catch (PayPalRESTException exc) { throw new RuntimeException(exc); }
-
-        return "All right";
+            return orderService.paidOrder(request);
+        } catch (PayPalRESTException exc) {
+            throw new RuntimeException(exc);
+        }
     }
 
     @GetMapping("/cancel")

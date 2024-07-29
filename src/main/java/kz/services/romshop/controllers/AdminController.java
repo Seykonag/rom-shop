@@ -15,7 +15,6 @@ import java.util.List;
 public class AdminController {
     private final UserService userService;
 
-
     @GetMapping("/users")
     public List<RegistrationDTO> usersList() { return userService.getAll(); }
 }

@@ -24,6 +24,6 @@ public class ProfileController {
     public void updateProfileUser(@RequestBody RegistrationDTO dto, Principal principal) {
         if (principal == null) throw new RuntimeException("Не авторизованы");
 
-        service.upgrade(dto, principal.getName());
+        service.updateProfile(dto, principal.getName());
     }
 }

@@ -19,15 +19,15 @@ public class BonusService {
 
     @Transactional
     public BonusScore createBonusScore(User user) {
-        BonusScore bonusScore = new BonusScore();
-        bonusScore.setId(user.getId()); // Присваиваем id BonusScore таким же, как у пользователя
-        bonusScore.setSum(BigDecimal.ZERO);
-        bonusScore.setUser(user);// Можно использовать константу BigDecimal.ZERO
+        BonusScore bonusScore = BonusScore.builder()
+                .id(user.getId())
+                .sum(BigDecimal.ZERO)
+                .user(user)
+                .build();
 
-        // Сохраняем BonusScore перед сохранением User, чтобы избежать проблем с целостностью данных
+
         BonusScore savedBonusScore = repository.save(bonusScore);
 
-        // Присваиваем сохраненный BonusScore пользователю
         user.setBonusScore(savedBonusScore);
         userRepository.save(user);
 
@@ -54,11 +54,9 @@ public class BonusService {
         BigDecimal paid;
 
         if (bonusSum.compareTo(orderSum) >= 0 ) {
-            System.out.println("Заказ полностью оплачен бонусами");
             bonusScore.setSum(bonusSum.subtract(orderSum));
             paid = new BigDecimal(0);
         } else {
-            System.out.println("Заказ частично оплачен бонусами");
             bonusScore.setSum(new BigDecimal(0));
             paid = orderSum.subtract(bonusSum);
         }
@@ -67,7 +65,10 @@ public class BonusService {
         return paid;
     }
 
-    public BonusScore getBonus(String username) {
-        return repository.findByUser(userRepository.getReferenceByUsername(username));
+    public BigDecimal getBonusSum(String username) {
+        return repository.findByUser(
+                userRepository.getReferenceByUsername(username)
+        )
+                .getSum();
     }
 }

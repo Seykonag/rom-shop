@@ -29,14 +29,13 @@ public class MarkService {
 
     @Transactional
     public Mark createMark(User user) {
-        Mark mark = new Mark();
-        mark.setId(user.getId()); // Присваиваем id Mark таким же, как у пользователя
-        mark.setUser(user);
+        Mark mark = Mark.builder()
+                .id(user.getId())
+                .user(user)
+                .build();
 
-        // Сохраняем Mark перед сохранением User, чтобы избежать проблем с целостностью данных
         Mark savedMark = markRepository.save(mark);
 
-        // Присваиваем сохраненный Mark пользователю
         user.setMark(savedMark);
         userRepository.save(user);
 
@@ -64,8 +63,8 @@ public class MarkService {
 
             if (detail == null) mapByProductId.put(product.getId(), new BucketDetailsDTO(product));
             else {
-                detail.setAmount(detail.getAmount().add(new BigDecimal(1.0)));
-                detail.setSum(detail.getSum() + Double.valueOf(product.getPrice().toString()));
+                detail.setAmount(detail.getAmount().add(new BigDecimal("1.0")));
+                detail.setSum(detail.getSum() + Double.parseDouble(product.getPrice().toString()));
             }
         }
 

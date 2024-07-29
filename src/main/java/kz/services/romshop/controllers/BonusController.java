@@ -16,7 +16,5 @@ public class BonusController {
     private final BonusService service;
 
     @GetMapping
-    public BigDecimal myBonus(Principal principal) {
-        return service.getBonus(principal.getName()).getSum();
-    }
+    public BigDecimal myBonus(Principal principal) { return service.getBonusSum(principal.getName()); }
 }

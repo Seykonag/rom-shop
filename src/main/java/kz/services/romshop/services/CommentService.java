@@ -2,6 +2,7 @@ package kz.services.romshop.services;
 
 import jakarta.transaction.Transactional;
 import kz.services.romshop.dto.CommentDTO;
+import kz.services.romshop.mappers.CommentMapper;
 import kz.services.romshop.models.*;
 import kz.services.romshop.repositories.CommentRepository;
 import kz.services.romshop.repositories.OrderRepository;
@@ -21,6 +22,7 @@ public class CommentService {
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
     private final CommentRepository repository;
+    private final CommentMapper commentMapper;
 
     @Transactional
     public void createComment(CommentDTO dto, String username) {
@@ -46,13 +48,7 @@ public class CommentService {
         if (product.getComment() == null) comments = new ArrayList<>();
         else comments = product.getComment();
 
-        Comment newComment = Comment.builder()
-                .user(user)
-                .text(dto.getText())
-                .rating(dto.getRating())
-                .status(dto.getRating() >= 4)
-                .answerAdmin(null)
-                .build();
+        Comment newComment = commentMapper.newComment(dto, user);
 
         comments.add(newComment);
 
@@ -78,16 +74,7 @@ public class CommentService {
 
 
         for (Comment comment: comments) {
-            list.add(
-                    CommentDTO.builder()
-                            .firstName(comment.getUser().getFirstName())
-                            .lastName(comment.getUser().getLastName())
-                            .username(comment.getUser().getUsername())
-                            .rating(comment.getRating())
-                            .data(comment.getDataComment())
-                            .text(comment.getText())
-                            .build()
-            );
+            list.add(commentMapper.fromCommentDto(comment));
         }
 
         return list;

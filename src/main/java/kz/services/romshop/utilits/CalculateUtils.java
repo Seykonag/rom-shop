@@ -1,6 +1,5 @@
 package kz.services.romshop.utilits;
 
-import kz.services.romshop.repositories.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

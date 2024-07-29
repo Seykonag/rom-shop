@@ -2,11 +2,8 @@ package kz.services.romshop.controllers;
 
 import kz.services.romshop.dto.CategoryDTO;
 import kz.services.romshop.dto.ProductDTO;
-import kz.services.romshop.dto.SaleDTO;
-import kz.services.romshop.repositories.ProductRepository;
 import kz.services.romshop.services.CategoryService;
 import kz.services.romshop.services.ProductService;
-import kz.services.romshop.services.SaleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

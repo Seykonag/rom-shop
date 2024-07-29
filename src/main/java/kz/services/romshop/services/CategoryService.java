@@ -9,13 +9,17 @@ import kz.services.romshop.repositories.CategoryRepository;
 import kz.services.romshop.repositories.ProductRepository;
 import kz.services.romshop.utilits.CalculateUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -24,7 +28,7 @@ public class CategoryService {
     private final ProductRepository productRepository;
     private final CategoryRepository repository;
 
-    public CategoryDTO createCategory(CategoryDTO dto) {
+    public ResponseEntity<Map<String, Object>> createCategory(CategoryDTO dto) {
         Category category = Category.builder()
                 .title(dto.getTitle())
                 .build();
@@ -33,11 +37,21 @@ public class CategoryService {
 
         dto.setId(category.getId());
 
-        return dto;
+        Map<String, Object> response = Map.of("data", dto);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     public void updateCategory(Long id, CategoryDTO dto) {
-        repository.updateCategory(dto, repository.getReferenceById(id));
+        Category category = repository.getReferenceById(id);
+        boolean changed = false;
+
+        if (!dto.getTitle().equals(category.getTitle())) {
+            category.setTitle(dto.getTitle());
+            changed = true;
+        }
+
+        if (changed) repository.save(category);
     }
 
     @Transactional
@@ -62,7 +76,7 @@ public class CategoryService {
     //Процентная скидка
     @Transactional
     public void newSale(Long id, Sale sale) {
-        List<Product> products = productRepository.findProductsByCategory(id);
+        List<Product> products = productRepository.findByCategoriesId(id);
         Category category = repository.getReferenceById(id);
 
         for (Product product: products) {

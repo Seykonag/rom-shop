@@ -15,6 +15,7 @@ import java.util.List;
 @RequestMapping("/sale")
 public class SaleController {
     private final SaleService service;
+
     @GetMapping("/all")
     public List<SaleDTO> getAll() { return service.getAll(); }
 

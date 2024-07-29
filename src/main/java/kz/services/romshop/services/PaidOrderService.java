@@ -6,6 +6,7 @@ import com.paypal.api.payments.Payment;
 import com.paypal.base.rest.PayPalRESTException;
 import jakarta.transaction.Transactional;
 import kz.services.romshop.dto.PaypalOrderDTO;
+import kz.services.romshop.mappers.PaypalOrderMapper;
 import kz.services.romshop.models.PaidOrder;
 import kz.services.romshop.repositories.PaidOrderRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ import java.util.List;
 public class PaidOrderService {
     private final OrderService orderService;
     private final PaypalService paypalService;
+    private final PaypalOrderMapper mapper;
     private final PaidOrderRepository repository;
 
     @Transactional
@@ -106,21 +108,7 @@ public class PaidOrderService {
         List<PaypalOrderDTO> dtoList =  new ArrayList<>();
 
         for (PaidOrder order: orders) {
-            dtoList.add(PaypalOrderDTO.builder()
-                            .id(order.getId())
-                            .orderID(order.getOrder().getId())
-                            .payerId(order.getPayerId())
-                            .paymentID(order.getPaymentID())
-                            .email(order.getEmail())
-                            .firstName(order.getFirstName())
-                            .lastName(order.getLastName())
-                            .transactionId(order.getTransactionId())
-                            .currency(order.getCurrency())
-                            .total(order.getTotal())
-                            .href(order.getHref())
-                            .created(order.getCreated())
-                            .updated(order.getUpdated())
-                            .build());
+            dtoList.add(mapper.fromPaypalOrder(order));
         }
 
         return dtoList;

@@ -20,7 +20,7 @@ public class CommentController {
     }
 
     @GetMapping("/findByProduct")
-    public List<CommentDTO> findByProduct(@RequestParam("idProduct") Long id, Principal principal) {
+    public List<CommentDTO> findByProduct(@RequestParam("idProduct") Long id) {
         return service.findByProduct(id);
     }
 }

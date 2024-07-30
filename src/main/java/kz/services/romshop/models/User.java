@@ -1,12 +1,5 @@
 package kz.services.romshop.models;
 
-import kz.services.romshop.models.Role;
-import kz.services.romshop.models.Country;
-import kz.services.romshop.models.Region;
-import kz.services.romshop.models.Bucket;
-import kz.services.romshop.models.Mark;
-import kz.services.romshop.models.BonusScore;
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,8 +26,6 @@ public class User implements UserDetails {
     @SequenceGenerator(name = SEQ_NAME, sequenceName = SEQ_NAME, allocationSize = 1)
     private Long id;
     @Column(nullable = false)
-    private String username;
-    @Column(nullable = false)
     private String email;
     @Column(nullable = false)
     private String firstName;
@@ -47,19 +38,6 @@ public class User implements UserDetails {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Role role;
-    @Column(nullable = false)
-    private String address;
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private Country country;
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private Region region;
-    @Column(nullable = false)
-    private String city;
-    private String index;
-    private String company;
-    private String fax;
     private boolean newsletter;
     private boolean archive;
     @OneToOne(cascade = CascadeType.REMOVE)
@@ -72,6 +50,11 @@ public class User implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
     }
 
     @Override

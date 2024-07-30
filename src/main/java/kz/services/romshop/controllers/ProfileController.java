@@ -15,7 +15,7 @@ public class ProfileController {
 
     @GetMapping
     public RegistrationDTO profileUser(Principal principal) {
-        if (principal == null) throw new RuntimeException("You not authorize");
+        if (principal == null) throw new RuntimeException("Не авторизованы");
 
         return service.getProfile(principal.getName());
     }
@@ -24,6 +24,6 @@ public class ProfileController {
     public void updateProfileUser(@RequestBody RegistrationDTO dto, Principal principal) {
         if (principal == null) throw new RuntimeException("Не авторизованы");
 
-        service.updateProfile(dto, principal.getName());
+        service.updateProfile(dto, dto.getEmail());
     }
 }

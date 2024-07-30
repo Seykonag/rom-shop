@@ -28,7 +28,7 @@ public class CommentService {
     public void createComment(CommentDTO dto, String username) {
         Order order = orderRepository.getReferenceById(dto.getIdOrder());
         Product product = productRepository.getReferenceById(dto.getIdProduct());
-        User user = userRepository.getReferenceByUsername(username);
+        User user = userRepository.getReferenceByEmail(username);
 
         boolean approved = false;
 

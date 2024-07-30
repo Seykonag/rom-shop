@@ -65,9 +65,9 @@ public class BonusService {
         return paid;
     }
 
-    public BigDecimal getBonusSum(String username) {
+    public BigDecimal getBonusSum(String email) {
         return repository.findByUser(
-                userRepository.getReferenceByUsername(username)
+                userRepository.getReferenceByEmail(email)
         )
                 .getSum();
     }

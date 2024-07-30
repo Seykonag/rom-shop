@@ -29,8 +29,8 @@ public class ProductService {
     private final CategoryService categoryService;
 
     @Transactional
-    public void addToUserBucket(Long productId, String username) {
-        User user = userRepository.getReferenceByUsername(username);
+    public void addToUserBucket(Long productId, String email) {
+        User user = userRepository.getReferenceByEmail(email);
 
         Bucket bucket =user.getBucket();
 
@@ -39,8 +39,8 @@ public class ProductService {
     }
 
     @Transactional
-    public void addToUserMark(Long productId, String username) {
-        User user = userRepository.getReferenceByUsername(username);
+    public void addToUserMark(Long productId, String email) {
+        User user = userRepository.getReferenceByEmail(email);
 
         Mark mark =user.getMark();
 
@@ -52,7 +52,6 @@ public class ProductService {
     public void createProduct(ProductDTO productDTO) {
         Category category = categoryRepository.getReferenceById(productDTO.getCategoryId());
 
-        System.out.println(productDTO.getRealPhoto());
         Product product = Product.builder()
                 .title(productDTO.getTitle())
                 .price(productDTO.getPrice())
@@ -174,7 +173,6 @@ public class ProductService {
     }
 
     private void updateProductDetails(Product product, ProductDTO request) {
-        boolean changed = false;
 
         Field[] dtoFields = request.getClass().getDeclaredFields();
         Field[] productFields = product.getClass().getDeclaredFields();
@@ -191,7 +189,6 @@ public class ProductService {
 
                         if (dtoValue != null && !dtoValue.equals(savedValue)) {
                             productField.set(product, dtoValue);
-                            changed = true;
                         }
                     } catch (IllegalAccessException exc) {
                         throw new RuntimeException("Продукт не изменен");

@@ -25,7 +25,6 @@ public class BucketService {
     private final BucketRepository bucketRepository;
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
-    private final UserService userService;
 
     @Transactional
     public Bucket createBucket(User user) {
@@ -53,8 +52,8 @@ public class BucketService {
     }
 
     @Transactional
-    public BucketDTO getBucketByUsername(String name) {
-        User user = userService.getByUsername(name);
+    public BucketDTO getBucketByUsername(String email) {
+        User user = userRepository.getReferenceByEmail(email);
 
         BucketDTO bucketDTO = new BucketDTO();
         Map<Long, BucketDetailsDTO> mapByProductId = new HashMap<>();
@@ -66,14 +65,14 @@ public class BucketService {
             if (product.getSalePrice() == null) {
                 if (detail == null) mapByProductId.put(product.getId(), new BucketDetailsDTO(product));
                 else {
-                    detail.setAmount(detail.getAmount().add(new BigDecimal(1.0)));
-                    detail.setSum(detail.getSum() + Double.valueOf(product.getPrice().toString()));
+                    detail.setAmount(detail.getAmount().add(new BigDecimal("1.0")));
+                    detail.setSum(detail.getSum() + Double.parseDouble(product.getPrice().toString()));
                 }
             } else {
                 if (detail == null) mapByProductId.put(product.getId(), new BucketDetailsDTO(product));
                 else {
-                    detail.setAmount(detail.getAmount().add(new BigDecimal(1.0)));
-                    detail.setSum(detail.getSum() + Double.valueOf(product.getSalePrice().toString()));
+                    detail.setAmount(detail.getAmount().add(new BigDecimal("1.0")));
+                    detail.setSum(detail.getSum() + Double.parseDouble(product.getSalePrice().toString()));
                 }
             }
         }
@@ -85,8 +84,8 @@ public class BucketService {
         return bucketDTO;
     }
 
-    public void deleteProduct(String username, List<Long> ids) {
-        Bucket bucket = bucketRepository.getReferenceByUserUsername(username);
+    public void deleteProduct(String email, List<Long> ids) {
+        Bucket bucket = bucketRepository.getReferenceByUserEmail(email);
         List<Product> products = bucket.getProducts();
         List<Product> deleteProducts = new ArrayList<>();
 
@@ -97,8 +96,8 @@ public class BucketService {
         bucketRepository.save(bucket);
     }
 
-    public void clear(String username) {
-        Bucket bucket = bucketRepository.getReferenceByUserUsername(username);
+    public void clear(String email) {
+        Bucket bucket = bucketRepository.getReferenceByUserEmail(email);
         bucket.setProducts(null);
 
         bucketRepository.save(bucket);

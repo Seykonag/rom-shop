@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface BucketRepository extends JpaRepository<Bucket, Long> {
-    Bucket getReferenceByUserUsername(String username);
+    Bucket getReferenceByUserEmail(String email);
 }

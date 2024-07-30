@@ -22,7 +22,6 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class MarkService {
-    private final UserService userService;
     private final MarkRepository markRepository;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
@@ -50,8 +49,8 @@ public class MarkService {
         markRepository.save(mark);
     }
 
-    public MarkDTO getMarkByUsername(String username) {
-        User user = userService.getByUsername(username);
+    public MarkDTO getMarkByUsername(String email) {
+        User user = userRepository.getReferenceByEmail(email);
 
         MarkDTO markDTO = new MarkDTO();
 

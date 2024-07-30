@@ -4,8 +4,6 @@ import jakarta.transaction.Transactional;
 import kz.services.romshop.dto.JwtAuthDTO;
 import kz.services.romshop.dto.LoginDTO;
 import kz.services.romshop.dto.RegistrationDTO;
-import kz.services.romshop.models.Country;
-import kz.services.romshop.models.Region;
 import kz.services.romshop.models.Role;
 import kz.services.romshop.models.User;
 import kz.services.romshop.repositories.UserRepository;
@@ -33,20 +31,12 @@ public class AuthService {
     @Transactional
     public JwtAuthDTO signUp(RegistrationDTO registrationDTO, boolean admin) {
         User user = User.builder()
-                .username(registrationDTO.getUsername())
                 .email(registrationDTO.getEmail())
                 .password(passwordEncoder.encode(registrationDTO.getPassword()))
                 .role(admin ? Role.ROLE_ADMIN : Role.ROLE_USER)
                 .firstName(registrationDTO.getFirstName())
                 .lastName(registrationDTO.getLastName())
                 .phone(registrationDTO.getPhone())
-                .fax(registrationDTO.getFax())
-                .company(registrationDTO.getCompany())
-                .address(registrationDTO.getAddress())
-                .city(registrationDTO.getCity())
-                .index(registrationDTO.getIndex())
-                .country(registrationDTO.getCountry())
-                .region(registrationDTO.getRegion())
                 .newsletter(registrationDTO.isNewsletter())
                 .build();
 
@@ -61,33 +51,28 @@ public class AuthService {
 
     public JwtAuthDTO signIn(LoginDTO request) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                request.getUsername(),
+                request.getEmail(),
                 request.getPassword()
         ));
 
         var user = userService
                 .userDetailsService()
-                .loadUserByUsername(request.getUsername());
+                .loadUserByUsername(request.getEmail());
 
         var jwt = jwtService.generateToken(user);
-        return new JwtAuthDTO(jwt, request.getUsername());
+        return new JwtAuthDTO(jwt, request.getEmail());
     }
 
     @Transactional
     public void firstAdmin() {
-        if (repository.findByUsername("admin").isEmpty()) {
+        if (!repository.existsByEmail("admin@email.com")) {
             User user = User.builder()
-                    .username("admin")
                     .email("admin@email.com")
                     .firstName("admin")
                     .lastName("admin")
                     .password(passwordEncoder.encode("admin"))
                     .role(Role.ROLE_ADMIN)
                     .phone("adminPhone")
-                    .address("admin home 1")
-                    .city("adminskoe")
-                    .country(Country.KAZAKHSTAN)
-                    .region(Region.PAVLODARSKIY)
                     .newsletter(false)
                     .build();
 

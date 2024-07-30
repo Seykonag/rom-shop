@@ -34,13 +34,13 @@ public class OrderService {
 
 
     @Transactional
-    public void createOrder(String username, Map<Long, Integer> productID) {
-        User user = userRepository.getReferenceByUsername(username);
+    public void createOrder(String email, Map<Long, Integer> productID) {
+        User user = userRepository.getReferenceByEmail(email);
 
         Order order = Order.builder()
                 .user(user)
                 .status(OrderStatus.NEW)
-                .address(user.getAddress())
+                .address("Тестовый адрес")
                 .build();
 
         List<OrderDetails> orderDetailsList = compileOrderDetails(order, productID);
@@ -60,8 +60,8 @@ public class OrderService {
         return orderDTOS;
     }
 
-    public List<OrderDTO> myOrders(String username) {
-        User user = userRepository.getReferenceByUsername(username);
+    public List<OrderDTO> myOrders(String email) {
+        User user = userRepository.getReferenceByEmail(email);
 
         return repository.findByUser(user).stream()
                 .map(orderMapper::mapToOrderDTO)
@@ -94,8 +94,8 @@ public class OrderService {
         }
     }
 
-    public void confirmOrder(Map<Long, Boolean> confirms, String username) {
-        User user = userRepository.getReferenceByUsername(username);
+    public void confirmOrder(Map<Long, Boolean> confirms, String email) {
+        User user = userRepository.getReferenceByEmail(email);
         Long key = confirms.keySet().iterator().next();
         Order order = repository.getReferenceById(key);
 

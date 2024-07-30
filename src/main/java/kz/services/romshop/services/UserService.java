@@ -31,10 +31,6 @@ public class UserService {
     }
 
     public User create(User user) {
-        if (repository.existsByUsername(user.getUsername())) {
-            throw new RuntimeException("Пользователь с таким именем уже существует");
-        }
-
         if (repository.existsByEmail(user.getEmail())) {
             throw new RuntimeException("Пользователь с таким email уже существует");
         }
@@ -42,7 +38,7 @@ public class UserService {
         return save(user);
     }
 
-    public User getByUsername(String username) { return repository.getReferenceByUsername(username); }
+    public User getByUsername(String email) { return repository.getReferenceByEmail(email); }
 
     public Boolean delete(List<Long> ids) {
         try {
@@ -54,8 +50,8 @@ public class UserService {
         return true;
     }
 
-    public void updateProfile(RegistrationDTO dto, String username) {
-        User savedUser = repository.getReferenceByUsername(username);
+    public void updateProfile(RegistrationDTO dto, String email) {
+        User savedUser = repository.getReferenceByEmail(email);
         boolean changed = false;
 
         Field[] dtoFields = dto.getClass().getDeclaredFields();
@@ -92,9 +88,9 @@ public class UserService {
         if (changed) save(savedUser);
     }
 
-    public RegistrationDTO getProfile(String username) {
+    public RegistrationDTO getProfile(String email) {
         return userMapper.toDto(
-                repository.getReferenceByUsername(username)
+                repository.getReferenceByEmail(email)
         );
     }
 

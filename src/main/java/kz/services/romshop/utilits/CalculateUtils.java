@@ -10,15 +10,21 @@ import java.math.RoundingMode;
 @Component
 @RequiredArgsConstructor
 public class CalculateUtils {
+
     public BigDecimal calculateSale(BigDecimal price, int sale) {
-        return price.subtract(
+        BigDecimal salePrice = price.subtract(
                 price.multiply(
                         new BigDecimal(sale).divide(new BigDecimal(100),
-                        new MathContext(2, RoundingMode.HALF_UP))
+                                new MathContext(2, RoundingMode.HALF_UP))
                 )
         );
-    }
 
+        if (salePrice.compareTo(new BigDecimal(0)) < 0) {
+            throw new RuntimeException("Error sale number");
+        }
+
+        return salePrice;
+    }
 
     public Double multiplyProduct(BigDecimal price, BigDecimal amount) {
         return price.multiply(amount).doubleValue();
